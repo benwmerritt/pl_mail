@@ -100,6 +100,8 @@ final class CalendarViewMemoryTest extends WebTestCase
             $crawler->filter('a[href="/calendar/3days/2026-11-30?pane=1"]'),
             'the next step is three days on',
         );
+        self::assertCount(1, $crawler->filter('#calendar-pane-frame [data-calendar-sets]'), 'the pane has its sets menu');
+        self::assertCount(0, $crawler->filter('.pane-header [data-calendar-sets]'), 'below the header, which keeps one row');
     }
 
     /**

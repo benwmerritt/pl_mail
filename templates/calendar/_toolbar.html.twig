@@ -49,11 +49,13 @@ calendar has no ends, so it never does.
     frame:     frame|default(null),
 } %}
     {% block toolbar_actions %}
-        {# The view's own URL, not the request's: the pane's first draw is a
-           sub-request whose URI is an internal fragment. #}
-        {% include 'calendar/_sets_menu.html.twig' with {
-            returnUrl: path('app_calendar_view', { view: view.value, date: anchor|date('Y-m-d') }) ~ paneQuery,
-        } only %}
+        {# The docked pane has no room in this row; its sets menu is in the
+           pane's footer (calendar/_pane_frame.html.twig). #}
+        {% if not compact %}
+            {% include 'calendar/_sets_menu.html.twig' with {
+                returnUrl: path('app_calendar_view', { view: view.value, date: anchor|date('Y-m-d') }),
+            } only %}
+        {% endif %}
 
         {# `data-calendar-new-event`: on a narrow month the day chosen under the
            grid is put in this button's URL, so it adds to that day, as the

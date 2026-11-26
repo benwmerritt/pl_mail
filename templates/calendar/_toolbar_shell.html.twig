@@ -97,7 +97,7 @@ Blocks:
 } %}
 
 <div class="@container/toolbar border-b border-line shrink-0">
-<div class="pane-header flex flex-wrap items-center gap-x-2 gap-y-1 px-3 @max-[37rem]/toolbar:gap-1 @max-[37rem]/toolbar:px-2 @max-[22rem]/toolbar:px-1">
+<div class="pane-header flex items-center gap-2 px-3 @max-[37rem]/toolbar:gap-1 @max-[37rem]/toolbar:px-2 @max-[22rem]/toolbar:px-1">
     <div class="flex items-center gap-0.5 shrink-0">
         {% if prevUrl is not null %}
             <a href="{{ prevUrl }}"
@@ -291,7 +291,7 @@ Blocks:
                               focus:outline-none focus-visible:ring-2 focus-visible:ring-inset
                               {{ shown|first == candidate.value ? 'rounded-l-lg' : '' }}
                               {{ shown|last == candidate.value ? 'rounded-r-lg' : '' }}
-                              {{ compact ? 'w-8 h-[1.875rem] @max-[37rem]/toolbar:w-7 @max-[37rem]/toolbar:h-[1.625rem] @max-[22rem]/toolbar:w-6 @max-[22rem]/toolbar:h-[1.375rem]' : 'px-2.5 h-[1.875rem] @max-[37rem]/toolbar:px-0 @max-[37rem]/toolbar:w-7 @max-[37rem]/toolbar:h-[1.625rem] @max-[22rem]/toolbar:w-6 @max-[22rem]/toolbar:h-[1.375rem]' }}
+                              {{ compact ? 'w-8 h-[1.875rem] @max-[37rem]/toolbar:w-6 @max-[37rem]/toolbar:h-[1.625rem] @max-[22rem]/toolbar:w-6 @max-[22rem]/toolbar:h-[1.375rem]' : 'px-2.5 h-[1.875rem] @max-[37rem]/toolbar:px-0 @max-[37rem]/toolbar:w-7 @max-[37rem]/toolbar:h-[1.625rem] @max-[22rem]/toolbar:w-6 @max-[22rem]/toolbar:h-[1.375rem]' }}
                               {{ candidate == view
                                   ? 'bg-accent text-accent-ink focus-visible:ring-accent-ink'
                                   : 'text-ink-muted hover:bg-hover hover:text-ink focus-visible:ring-accent' }}"
