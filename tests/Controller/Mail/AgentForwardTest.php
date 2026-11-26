@@ -118,6 +118,19 @@ final class AgentForwardTest extends WebTestCase
         self::assertStringContainsString("  line one\n    indented  twice\n\n\n\nafter gap", (string) $this->queuedDraft()->bodyText);
     }
 
+    public function testTheTextPartKeepsTableCellsApart(): void
+    {
+        $client  = $this->signIn();
+        $message = $this->message();
+
+        $message->bodyHtml = '<table><tr><td>Total</td><td>$42.00</td></tr></table>';
+        $this->em->flush();
+
+        $this->forward($client, $message, self::AGENT, '');
+
+        self::assertStringContainsString("Total\t$42.00", (string) $this->queuedDraft()->bodyText);
+    }
+
     public function testTheNoteIsTextNotMarkup(): void
     {
         $client = $this->signIn();

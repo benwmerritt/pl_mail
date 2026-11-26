@@ -283,6 +283,7 @@ final readonly class AgentForwarder
         $html = (string) preg_replace('/\s+/', ' ', $html);
         $html = (string) preg_replace('#<div[^>]*data-quoted#i', "\n$0", $html);
         $html = (string) preg_replace('#<br\s*/?>|</(p|div|li|tr|h[1-6]|blockquote)\s*>#i', "$0\n", $html);
+        $html = (string) preg_replace('#</t[dh]\s*>#i', "$0\t", $html);
         $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $text = (string) preg_replace('/^[ \t]+|[ \t]+$/m', '', $text);
         $text = (string) preg_replace('/\n{3,}/', "\n\n", $text);
