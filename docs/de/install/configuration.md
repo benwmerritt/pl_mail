@@ -1,4 +1,4 @@
-<!-- translated-from: install/configuration.md sha1:d4bb147efa8b7f493d56686e9f238aaeaedb2a4b -->
+<!-- translated-from: install/configuration.md sha1:86ab2488388e44e7b8f4c8d0178d8e9020ff1570 -->
 # Konfigurationsreferenz
 
 Jede Umgebungsvariable, die plMail liest, was sie bewirkt, welchen Vorgabewert sie hat und was
@@ -95,6 +95,7 @@ Das sind die Variablen aus `.env`, in der Reihenfolge, in der sie dort stehen.
 | `VAPID_PRIVATE_KEY` | Der zugehörige private Schlüssel. | leer — erzeugt | Ja, aber erzeugt | Wie oben. |
 | `PUSH_ALLOWED_HOSTS` | Kommagetrennte Hosts, auf die ein Push-Endpunkt zeigen darf, obwohl sie auf eine private Adresse auflösen. | leer | Nur für ein ntfy im LAN | Jeder andere private, Loopback- oder Link-Local-Endpunkt wird bei der Registrierung und beim Senden abgewiesen. Läuft das mitgelieferte ntfy auf einer LAN- oder Tailscale-Adresse, setz hier deinen `SERVER_NAME`, sonst bekommen die Telefone keine Pushes mehr. Siehe [den SSRF-Schutz](#der-ssrf-schutz) weiter unten. |
 | `APP_FEEDBACK_TO` | Wohin **Feedback senden** in „Was ist neu“ mailt. Die Mail geht über das eigene Konto der Person; das hier ist nur der Empfänger. | `feedback@pluetzner.de` (auch der Parameter `app.fallback_feedback_to`, der greift, wenn die Variable fehlt) | Nein | Das Feedback der Leute auf dieser Installation geht an den Entwickler von plMail. Trag deine eigene Adresse ein, um es selbst zu lesen; ein Tippfehler schickt es ins Leere, und wer es geschrieben hat, bekommt einen Bounce ins eigene Postfach. |
+| `TWENTY_URL` | Die Adresse eines [Twenty](https://twenty.com)-CRM, etwa `https://crm.example.com`. Jede E-Mail-Adresse eines Kontakts und neben dem Absender einer Nachricht bekommt einen Link zu dieser Person in Twenty. plMail stellt keine Anfrage an Twenty; der Link öffnet Twentys Personenliste, gefiltert auf die Adresse. | leer | Nein | Leer zeigt keinen Link. Eine falsche Adresse ergibt Links, die nichts öffnen. |
 
 **Der typische Fehlerfall bei dieser Tabelle ist, ein Leerfeld für einen fehlenden Wert zu halten.**
 Vier der obigen Leerfelder sind tragend: Sie sind leer, damit die Erzeugung beim ersten Start
