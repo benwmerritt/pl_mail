@@ -223,14 +223,16 @@ export default class extends Controller {
      * where it has one (an account, by its address), and otherwise by its
      * text without the counts and new-mail dots the sidebar patches into it;
      * each place once, though the rail and the drawer both draw it. An
-     * account's folders sit under its address, as every account has an Inbox.
+     * account's folders sit under its address, as every account has an Inbox,
+     * and a nested label under its parents, as Work and Personal can both
+     * have Invoices; its whole path ("Work/Invoices") finds it too.
      */
     #places() {
         const go = this.#goKeys();
         const seen = new Set();
         const places = [];
 
-        const add = (link, crumb) => {
+        const add = (link, crumb, parents = []) => {
             const url = new URL(link.getAttribute("href"), window.location.href);
             const title = (link.getAttribute("title") || this.#text(link)).replace(/\s+/g, " ").trim();
 
@@ -242,10 +244,16 @@ export default class extends Controller {
 
             const key = ("" === url.search ? go[url.pathname] : undefined) ?? go[link.dataset.alsoOpenAt];
 
-            places.push({ title, crumb, terms: "", url: url.href, keys: undefined === key ? [] : ["g", key] });
+            places.push({
+                title,
+                crumb: [crumb, ...parents].join(" › "),
+                terms: 0 === parents.length ? "" : [...parents, title].join("/"),
+                url: url.href,
+                keys: undefined === key ? [] : ["g", key],
+            });
         };
 
-        document.querySelectorAll(PLACES).forEach((link) => add(link, this.#crumb(link)));
+        document.querySelectorAll(PLACES).forEach((link) => add(link, this.#crumb(link), this.#parents(link)));
         document.querySelectorAll(TABS).forEach((link) => add(link, this.messagesValue.tab ?? ""));
 
         return places;
@@ -261,6 +269,21 @@ export default class extends Controller {
         return link.closest("details.group\\/section")?.querySelector("summary")?.getAttribute("aria-label")
             ?? this.messagesValue.place
             ?? "";
+    }
+
+    /** The labels a nested one sits in, outermost first. */
+    #parents(link) {
+        const parents = [];
+
+        for (let tree = link.closest("details.group\\/tree"); null !== tree; tree = tree.parentElement.closest("details.group\\/tree")) {
+            const summary = tree.querySelector(":scope > summary");
+
+            if (false === summary.contains(link)) {
+                parents.unshift(this.#text(summary.querySelector(PLACES) ?? summary).replace(/\s+/g, " ").trim());
+            }
+        }
+
+        return parents;
     }
 
     #text(link) {
