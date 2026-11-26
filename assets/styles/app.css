@@ -4045,8 +4045,12 @@ html {
     outline-offset: -1px;
 }
 
-[data-tentative].block-tint {
+[data-tentative].block-tint,
+.block-tint:has([data-tentative]) {
     --block-tint: color-mix(in srgb, var(--block-color, transparent) 10%, transparent);
+}
+
+[data-tentative].block-tint {
     background-image:
         repeating-linear-gradient(135deg, var(--block-stripe) 0 5px, transparent 5px 10px),
         linear-gradient(var(--block-tint), var(--block-tint));

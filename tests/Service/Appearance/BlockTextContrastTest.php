@@ -27,8 +27,6 @@ final class BlockTextContrastTest extends TestCase
 
     private const float BLOCK_WASH = 0.28;
 
-    private const float MAYBE_WASH = 0.10;
-
     /** --block-stripe is the colour at alpha 2e. */
     private const float MAYBE_STRIPE = 0x2E / 255;
 
@@ -60,7 +58,7 @@ final class BlockTextContrastTest extends TestCase
                     for ($b = 0; $b <= 255; $b += 15) {
                         $colour = [$r, $g, $b];
                         $text   = self::derive($colour, $ink, $dark);
-                        $maybe  = self::wash($colour, self::MAYBE_WASH, $ground, $text);
+                        $maybe  = self::wash($colour, self::maybeWash(), $ground, $text);
 
                         $backgrounds = [
                             'its wash'           => self::wash($colour, self::BLOCK_WASH, $ground, $text),
@@ -84,6 +82,39 @@ final class BlockTextContrastTest extends TestCase
             $worst[0],
             sprintf('%s: the worst block was %s at %.2f:1', $theme->value, $worst[1], $worst[0]),
         );
+    }
+
+    /**
+     * A saved Maybe on the time grid carries data-tentative on the chip inside
+     * the block, and the invitation's face carries it on the block itself, so
+     * the lighter wash under the stripes has to reach both.
+     */
+    public function testAMaybeBlockTakesTheLighterWashUnderItsStripes(): void
+    {
+        self::maybeWash();
+
+        $grid = (string) file_get_contents(dirname(__DIR__, 3) . '/templates/calendar/_view_timegrid.html.twig');
+        $chip = (string) file_get_contents(dirname(__DIR__, 3) . '/templates/calendar/_event_chip.html.twig');
+
+        self::assertMatchesRegularExpression('/class="[^"]*\bblock-tint\b[^"]*"[^>]*>\s*(\{#.*?#\}\s*)*\{% include \'calendar\/_event_chip\.html\.twig\'/s', $grid);
+        self::assertStringContainsString('data-tentative', $chip);
+    }
+
+    private static function maybeWash(): float
+    {
+        static $wash = null;
+
+        if (null === $wash) {
+            self::assertSame(
+                1,
+                preg_match('/\[data-tentative\]\.block-tint\s*,\s*\.block-tint:has\(\[data-tentative\]\)\s*\{\s*--block-tint\s*:\s*color-mix\([^;]*?(\d+)%/', self::css(), $match),
+                'app.css gives neither a Maybe block nor a block holding a Maybe chip its own --block-tint',
+            );
+
+            $wash = (int) $match[1] / 100;
+        }
+
+        return $wash;
     }
 
     /**
