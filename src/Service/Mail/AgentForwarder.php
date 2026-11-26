@@ -29,9 +29,13 @@ use Symfony\Component\Messenger\Stamp\DelayStamp;
  * Forwards only the browser composer can make are refused rather than sent:
  * encrypted mail, whose quote it decrypts, and a send it would sign or
  * encrypt — "sign plain mail", "always encrypt" for the address it goes from,
- * or an agent whose address has a key or its own Always policy. Sent from
- * here, the first would carry a marker where the mail should be and the rest
- * would go out in the clear without saying so.
+ * or a recipient, the agent or a default Bcc, whose address has a key or its
+ * own Always policy. Sent from here, the first would carry a marker where the
+ * mail should be and the rest would go out in the clear without saying so.
+ *
+ * A forward whose attachments could not all be copied is saved, not sent: the
+ * composer shows a missing file as a missing chip, and this dialog has no
+ * chips to show it with.
  */
 final readonly class AgentForwarder
 {
@@ -48,6 +52,7 @@ final readonly class AgentForwarder
         private MessageBusInterface    $bus,
         private EntityManagerInterface $entityManager,
         private RecipientKeys          $recipientKeys,
+        private DefaultBccProvider     $defaultBcc,
     ) {
     }
 
@@ -63,7 +68,13 @@ final readonly class AgentForwarder
 
         $account = $this->sendingAccount($original, $user);
 
-        if (true === self::sealsWhatItSends($user, (string) ($account->displayAddress ?? $account->email ?? ''))) {
+        if (null === $account) {
+            return null;
+        }
+
+        $from = (string) ($account->displayAddress ?? $account->email);
+
+        if (true === self::sealsWhatItSends($user, $from) || true === $this->sealsAny($user, $this->defaultBcc->addressesFor($account, $from))) {
             return self::REFUSED_SEALED;
         }
 
@@ -78,7 +89,75 @@ final readonly class AgentForwarder
      */
     public function sealsFor(User $user, ForwardAgent $agent): bool
     {
-        foreach ($this->recipientKeys->describe($user, [$agent->address], false) as $recipient) {
+        return $this->sealsAny($user, [$agent->address]);
+    }
+
+    /**
+     * Build, save and queue the forward. Answers the draft and whether it was
+     * queued — false when an attachment could not be copied and the forward
+     * was left in Drafts — or null when there is nothing to send it from or
+     * the original cannot be forwarded from here.
+     *
+     * @return array{draft: Message, sent: bool}|null
+     */
+    public function forward(Message $original, ForwardAgent $agent, string $note, User $user): ?array
+    {
+        $account = $this->sendingAccount($original, $user);
+
+        if (null === $account || null !== $this->refusal($original, $user)) {
+            return null;
+        }
+
+        $draft              = $this->replyDrafts->forward($original);
+        $draft->toAddresses = [['name' => $agent->name, 'address' => $agent->address]];
+        $draft->bodyHtml    = self::withNote($note, (string) $draft->bodyHtml);
+
+        $sender = $this->senders->addressFor($this->senders->tokenFor($draft, $account), $account, $user);
+
+        // The builder copied the Bcc of the account the mail is in; the
+        // forward goes from $sender, whose own Bcc is the one that applies.
+        $draft->bccAddresses = null;
+        $this->defaultBcc->applyTo($draft, $account, $sender);
+
+        if (true === self::sealsWhatItSends($user, $sender) || true === $this->sealsAny($user, self::recipients($draft))) {
+            return null;
+        }
+
+        // Saved before the files are copied and again after, as the composer
+        // does across opening a forward and pressing Send: the bytes are
+        // bucketed by message id, which the first save gives the draft.
+        $this->drafts->save($draft, $account, $sender);
+
+        $expected = $this->forwardedAttachments->count($original);
+
+        if (0 < $expected) {
+            $copied = $this->forwardedAttachments->copy($original, $draft);
+            $this->drafts->save($draft, $account, $sender);
+
+            if ($copied < $expected) {
+                return ['draft' => $draft, 'sent' => false];
+            }
+        }
+
+        $draft->bodyText = self::wholeText((string) $draft->bodyHtml);
+        $this->entityManager->flush();
+
+        $this->bus->dispatch(
+            new SendMessageMessage((int) $draft->id, $draft->submissionSendAt),
+            [new DelayStamp(ComposeController::SEND_DELAY_MS)],
+        );
+
+        return ['draft' => $draft, 'sent' => true];
+    }
+
+    /** @param list<string> $addresses */
+    private function sealsAny(User $user, array $addresses): bool
+    {
+        if ([] === $addresses) {
+            return false;
+        }
+
+        foreach ($this->recipientKeys->describe($user, $addresses, false) as $recipient) {
             if (RecipientPolicy::Always->value === $recipient['encrypt'] || RecipientPolicy::Always->value === $recipient['sign']) {
                 return true;
             }
@@ -92,50 +171,6 @@ final readonly class AgentForwarder
     }
 
     /**
-     * Build, save and queue the forward. Answers the draft, now on its way, or
-     * null when there is nothing to send it from or the original cannot be
-     * forwarded from here.
-     */
-    public function forward(Message $original, ForwardAgent $agent, string $note, User $user): ?Message
-    {
-        $account = $this->sendingAccount($original, $user);
-
-        if (null === $account || null !== $this->refusal($original, $user) || true === $this->sealsFor($user, $agent)) {
-            return null;
-        }
-
-        $draft              = $this->replyDrafts->forward($original);
-        $draft->toAddresses = [['name' => $agent->name, 'address' => $agent->address]];
-        $draft->bodyHtml    = self::withNote($note, (string) $draft->bodyHtml);
-
-        $sender = $this->senders->addressFor($this->senders->tokenFor($draft, $account), $account, $user);
-
-        if (true === self::sealsWhatItSends($user, $sender)) {
-            return null;
-        }
-
-        // Saved before the files are copied and again after, as the composer
-        // does across opening a forward and pressing Send: the bytes are
-        // bucketed by message id, which the first save gives the draft.
-        $this->drafts->save($draft, $account, $sender);
-
-        if (true === $this->forwardedAttachments->has($original)) {
-            $this->forwardedAttachments->copy($original, $draft);
-            $this->drafts->save($draft, $account, $sender);
-        }
-
-        $draft->bodyText = self::wholeText((string) $draft->bodyHtml);
-        $this->entityManager->flush();
-
-        $this->bus->dispatch(
-            new SendMessageMessage((int) $draft->id, $draft->submissionSendAt),
-            [new DelayStamp(ComposeController::SEND_DELAY_MS)],
-        );
-
-        return $draft;
-    }
-
-    /**
      * The account the mail is in, as a forward from the composer would use,
      * unless that account only receives; then the one a new message would go
      * from.
@@ -145,6 +180,15 @@ final readonly class AgentForwarder
         return true === $original->account->sendEnabled
             ? $original->account
             : $this->window->defaultAccountFor($user);
+    }
+
+    /** @return list<string> */
+    private static function recipients(Message $draft): array
+    {
+        return array_values(array_filter(array_map(
+            static fn (array $entry): string => (string) ($entry['address'] ?? ''),
+            [...($draft->toAddresses ?? []), ...($draft->ccAddresses ?? []), ...($draft->bccAddresses ?? [])],
+        )));
     }
 
     private static function sealsWhatItSends(User $user, string $from): bool

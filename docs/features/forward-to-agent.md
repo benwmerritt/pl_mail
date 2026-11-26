@@ -26,9 +26,12 @@ dialog only sends to an address on this list.
 - **Encrypted or signed mail goes through Forward.** Only the compose window can decrypt an
   encrypted email's quote, and only it can sign or encrypt what you send. So the dialog sends
   nothing when the email is encrypted, when you sign everything you send, or when the address it
-  goes from is set to always encrypt; and an agent whose address has a key, or is set to always
-  encrypt or sign, is shown but cannot be picked. Use **Forward** for those.
+  goes from is set to always encrypt, or when a default Bcc has a key or is set to always encrypt;
+  and an agent whose address has a key, or is set to always encrypt or sign, is shown but cannot be
+  picked. Use **Forward** for those.
+- **A missing attachment stops the send.** An attachment over 25 MiB, or one that cannot be
+  fetched, is not copied. The forward then waits in Drafts instead of going out without it.
 - **After Undo it is an ordinary forward.** Sent again from the compose window, its plain-text part
   is your note alone, as any forward's is; the HTML part still carries the email.
 - **A receive-only account cannot send.** The forward then goes from the account a new message
-  would use.
+  would use, with that account's default Bcc.

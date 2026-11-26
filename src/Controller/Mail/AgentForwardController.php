@@ -83,10 +83,10 @@ final class AgentForwardController extends AbstractController
             throw new UnprocessableEntityHttpException('Not one of your agents.');
         }
 
-        $note  = mb_substr((string) ($payload['note'] ?? ''), 0, self::MAX_NOTE_CHARS);
-        $draft = $this->forwarder->forward($message, $agent, $note, $user);
+        $note    = mb_substr((string) ($payload['note'] ?? ''), 0, self::MAX_NOTE_CHARS);
+        $forward = $this->forwarder->forward($message, $agent, $note, $user);
 
-        if (null === $draft) {
+        if (null === $forward) {
             throw new UnprocessableEntityHttpException('This mail cannot be forwarded from here.');
         }
 
@@ -94,7 +94,8 @@ final class AgentForwardController extends AbstractController
 
         return $this->renderTurboStream('mail/_agent_forward_sent.stream.html.twig', [
             'agent'        => $agent,
-            'undoUrl'      => $this->generateUrl('app_compose_mail_undo', $dock->urlParams() + ['id' => $draft->id]),
+            'sent'         => $forward['sent'],
+            'undoUrl'      => $this->generateUrl('app_compose_mail_undo', $dock->urlParams() + ['id' => $forward['draft']->id]),
             'cancelWindow' => ComposeController::CANCEL_WINDOW_MS,
         ]);
     }
