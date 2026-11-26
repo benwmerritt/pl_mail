@@ -1596,6 +1596,8 @@ calendar:
         day_one: '1 jour'
         days: '%count% jours'
         length: 'Durée'
+        typed: 'Saisir une heure : tue 3pm, 2 days…'
+        typed_unknown: 'Heure illisible. Essayez tue 3pm ou 2 days (en anglais ou en allemand).'
     default_name: Personnel
     alert:
         mail:

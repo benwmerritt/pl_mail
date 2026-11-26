@@ -57,7 +57,7 @@ Variables: message, params (from the including context); placement.
 <div class="relative shrink-0 {{ header ? 'flex md:hidden ml-1' : 'hidden md:flex mr-2' }}"
      data-compose-send-pill="{{ placement }}"
      data-controller="ui--dropdown compose--schedule"
-     data-action="ui--dropdown:opened->compose--schedule#refresh"
+     data-action="ui--dropdown:opened->compose--schedule#refresh ui--dropdown:opened->compose--schedule#focusTyped"
      {# The zone every other timestamp in this app is drawn in — the user's
         setting, not the browser's guess. The menu computes "tomorrow morning"
         against it and posts a wall clock; ScheduledSendResolver turns that into
@@ -76,6 +76,7 @@ Variables: message, params (from the including context); placement.
          scheduleTooFar:     'compose.schedule.error.too_far'|trans({
              '%days%': constant('App\\Service\\Mail\\ScheduledSendResolver::MAX_SECONDS') // 86400,
          }),
+         typedUnknown:       'calendar.when.typed_unknown'|trans,
      }|json_encode|e('html_attr') }}">
 
     {# ── Send, and while a send is in flight, the way out of it ──────────
@@ -206,6 +207,31 @@ Variables: message, params (from the including context); placement.
         <p class="px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-ink-faint">
             {{ 'compose.schedule.heading'|trans }}
         </p>
+
+        {# A time typed rather than picked (BMAIL-12), read in the configured
+           zone like every preset here. Unnamed, so never submitted: what it was
+           read as becomes one more submit button below it, and Enter in the
+           field presses that rather than the form's Send. See
+           compose--schedule#read and assets/typed_time.js. #}
+        <div class="px-2 pt-1 pb-1">
+            <input type="text"
+                   data-compose--schedule-target="typed"
+                   data-action="input->compose--schedule#read keydown->compose--schedule#take"
+                   placeholder="{{ 'calendar.when.typed'|trans }}"
+                   aria-label="{{ 'calendar.when.typed'|trans }}"
+                   autocomplete="off" spellcheck="false" enterkeyhint="done"
+                   class="h-7 w-full rounded-lg border border-field-border bg-field px-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+        </div>
+        <button type="submit" hidden style="display:none" formnovalidate
+                formaction="{{ scheduleUrl }}"
+                data-compose--schedule-target="reading"
+                data-action="click->compose--schedule#choose"
+                class="w-full flex items-center justify-between gap-3 px-3 py-2 text-sm text-ink
+                       hover:bg-hover transition-colors text-left">
+            <span data-schedule-when class="tabular-nums"></span>
+            <kbd class="shrink-0 rounded border border-line bg-raised px-1.5 font-mono text-[11px] text-ink-muted" aria-hidden="true">↵</kbd>
+        </button>
+        <p data-compose--schedule-target="unread" hidden class="px-3 py-1.5 text-xs text-ink-faint"></p>
 
         {# Hidden until the controller has a time to put on it: a preset showing
            its label and no hour is a button whose effect you cannot read.

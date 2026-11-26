@@ -1442,6 +1442,8 @@ calendar:
         day_one: '1 天'
         days: '%count% 天'
         length: 时长
+        typed: '输入时间：tue 3pm、2 days…'
+        typed_unknown: '无法识别该时间。试试 tue 3pm 或 2 days（英文或德文）。'
     default_name: 个人
     alert:
         mail:

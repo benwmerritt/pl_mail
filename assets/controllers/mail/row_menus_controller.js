@@ -103,7 +103,9 @@ export default class extends Controller {
         window.addEventListener("scroll", this._onMove, { capture: true });
         window.addEventListener("resize", this._onMove);
 
-        if (true === keyboard) {
+        const typing = true === this.application.getControllerForElementAndIdentifier(panel, "mail--snooze-menu")?.focusTyped();
+
+        if (true === keyboard && false === typing) {
             this.#items()[0]?.focus();
         }
     }

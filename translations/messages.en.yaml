@@ -1587,6 +1587,8 @@ calendar:
         day_one: '1 day'
         days: '%count% days'
         length: 'Length'
+        typed: 'Type a time: tue 3pm, 2 days…'
+        typed_unknown: 'Not a time I can read. Try tue 3pm or 2 days.'
     default_name: Personal
     alert:
         mail:

@@ -1,4 +1,4 @@
-<!-- translated-from: features/mail.md sha1:c7c12a4ba2a4706f488e61aa04a04914569fd25c -->
+<!-- translated-from: features/mail.md sha1:b94441ef3d4edc01f613417db27dc11ca597165e -->
 
 # Mail
 
@@ -1272,6 +1272,13 @@ am nächsten Tag, am kommenden Samstag und am kommenden Montag. Alle vier werden
 Browser berechnet, denn der Server sieht für die Sitzung nie eine Zeitzone und würde „morgen
 früh“ sonst dort auflösen, wo der Container sich vermutet.
 
+Oder tipp die Zeit ins Feld oben im Menü: *di 15 Uhr*, *2 Tage*, *nächsten Monat*, *morgen 9:30*,
+*in 3 Stunden*, oder dasselbe auf Englisch, *tue 3pm*, *2 days*, *next month*. Wie die Zeit
+verstanden wurde, steht unter dem Feld, und **Enter** stellt bis dahin zurück. Ein Tag ohne Uhrzeit
+ist 08:00, eine einzelne Stunde von 1 bis 7 ist die am Nachmittag, und ein Wochentag ist der
+nächste nach heute. Mit Tastatur hat das Feld den Fokus, sobald das Menü aufgeht, also reichen
+**b** und die Zeit.
+
 `app:mail:wake-snoozed` läuft jede Minute und ist das, was Konversationen zurückbringt. Eine
 geweckte Konversation wird als **ungelesen** markiert — das ist der Sinn der Funktion, denn
 eine Konversation, die in dem Zustand wiederkommt, in dem du sie verlassen hast, hast du
@@ -1651,6 +1658,10 @@ Der Pfeil neben **Senden** öffnet **Später senden**: *Morgen früh* (08:00), *
 (13:00), *Montagmorgen* und **Datum & Uhrzeit wählen** für alles andere. Ist morgen bereits Montag,
 entfällt der dritte Eintrag, denn ein Menü, das denselben Zeitpunkt unter zwei Namen anbietet, ist
 ein Menü, bei dem man nachsehen muss.
+
+Auch hier lässt sich oben im Menü eine Zeit eintippen, gelesen wie beim
+[Zurückstellen](#zurückstellen): Wie sie verstanden wurde, steht unter dem Feld, und **Enter**
+plant sie. **Enter** sendet dort nie. Eine Zeit außerhalb der Grenzen unten sagt das stattdessen.
 
 Jede Zeit wird auf **deiner** Uhr gelesen — Zeitzone und 12- oder 24-Stunden-Format aus
 **Einstellungen → Allgemein → Sprache & Region**, nicht aus dem Browser — und das Menü sagt, welche Zone es meint. Ein

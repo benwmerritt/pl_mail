@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus";
 import { formatWallClock, instantOf, scheduleOptions, zoneHorizon, zoneNow } from "../../schedule_options.js";
 import { requestFailed } from "../../request_errors.js";
 import { csrfToken } from "../../csrf.js";
+import { formatTypedTime, readTypedTime } from "../../typed_time.js";
 
 /**
  * The send pill's chevron: send later.
@@ -26,6 +27,11 @@ import { csrfToken } from "../../csrf.js";
  * **The zone is the configured one, never the browser's.** See
  * assets/schedule_options.js — this posts a wall clock and lets the server
  * turn it into an instant.
+ *
+ * **A time can be typed** (BMAIL-12): "tue 3pm" or "2 days" is read on that
+ * same configured clock, checked against the same bounds as a picked time,
+ * and offered as one more submit button. Enter in the field presses it, and
+ * never the form's own Send.
  */
 /**
  * The instant the containing whole minute began.
@@ -41,7 +47,7 @@ function minuteOf(ms) {
 }
 
 export default class extends Controller {
-    static targets = ["option", "field", "custom", "input", "error", "toggle"];
+    static targets = ["option", "field", "custom", "input", "error", "toggle", "typed", "reading", "unread"];
 
     static values = {
         // IANA identifier from ClockGlobal — the zone the rest of the app draws
@@ -96,6 +102,53 @@ export default class extends Controller {
         if (true === this.hasInputTarget) {
             this.inputTarget.min = zoneNow(this.timezoneValue);
             this.inputTarget.max = zoneHorizon(this.timezoneValue, this.maxDaysValue);
+        }
+
+        if (true === this.hasTypedTarget) {
+            this.typedTarget.value = "";
+            this.read();
+        }
+    }
+
+    /**
+     * Into the field once the menu is open, where there is a keyboard to type
+     * with. On a phone the keyboard would cover the menu to offer what a tap
+     * on a preset does.
+     */
+    focusTyped() {
+        if (true === this.hasTypedTarget && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+            this.typedTarget.focus();
+        }
+    }
+
+    /** What has been typed so far, read: the option it names, or why there is none. */
+    read() {
+        const text    = this.typedTarget.value.trim();
+        const at      = "" === text ? null : readTypedTime(text, zoneNow(this.timezoneValue));
+        const problem = null === at ? null : this._problem(at);
+
+        const offered = null !== at && null === problem;
+
+        this._show(this.readingTarget, offered);
+        this.unreadTarget.hidden = "" === text || offered;
+        this.unreadTarget.textContent = problem ?? this._t("typedUnknown", "Not a time I can read.");
+
+        if (true === offered) {
+            this.readingTarget.dataset.scheduleAt = at;
+            this.readingTarget.querySelector("[data-schedule-when]").textContent = formatTypedTime(at, document.documentElement.lang || undefined);
+        }
+    }
+
+    /** Enter takes what was read. Left alone it would submit the form, which is Send. */
+    take(event) {
+        if ("Enter" !== event.key || event.isComposing) {
+            return;
+        }
+
+        event.preventDefault();
+
+        if (false === this.readingTarget.hidden) {
+            this.readingTarget.click();
         }
     }
 
@@ -160,39 +213,10 @@ export default class extends Controller {
             return;
         }
 
-        // As instants, not as strings. The three bounds below are all still
-        // computed as wall clocks — that is what the field holds and what the
-        // server is sent — but comparing them is a question about TIME, and for
-        // the hour a fall-back repeats the two orderings disagree. See
-        // instantOf(), which also explains what that cost.
-        const chosenAt = this._instant(chosen);
+        const problem = this._problem(chosen);
 
-        if (chosenAt < minuteOf(Date.now())) {
-            this._refuse(event, this._t("schedulePast", "That time has already passed."));
-
-            return;
-        }
-
-        // Still to come, but too soon to be a schedule. This is the band the
-        // whole feature used to fall down: a person testing "does send later
-        // work" types the NEXT WHOLE MINUTE, which is almost always under
-        // ScheduledSendResolver::MIN_SECONDS away. The old check only asked
-        // whether the time had passed, so that click sailed through the browser,
-        // was refused by the resolver, and came back as a root-level form error
-        // the compose window had nowhere to render — no toast, no message, no
-        // schedule. Refusing it here is what makes the common case legible.
-        if (chosenAt < this._floor()) {
-            this._refuse(event, this._t("scheduleTooSoon", "Pick a time at least a minute from now."));
-
-            return;
-        }
-
-        if (chosenAt > this._instant(zoneHorizon(this.timezoneValue, this.maxDaysValue))) {
-            this._refuse(
-                event,
-                this._t("scheduleTooFar", "Mail can be held for at most %days% days.")
-                    .replace("%days%", String(this.maxDaysValue)),
-            );
+        if (null !== problem) {
+            this._refuse(event, problem);
 
             return;
         }
@@ -240,6 +264,42 @@ export default class extends Controller {
     }
 
     // ── Private ───────────────────────────────────────────────────────────
+
+    /**
+     * Why a wall clock cannot be scheduled, translated, or null when it can.
+     * Shared by a picked time and a typed one, so the two refuse alike.
+     */
+    _problem(chosen) {
+        // As instants, not as strings. The three bounds below are all still
+        // computed as wall clocks — that is what the field holds and what the
+        // server is sent — but comparing them is a question about TIME, and for
+        // the hour a fall-back repeats the two orderings disagree. See
+        // instantOf(), which also explains what that cost.
+        const chosenAt = this._instant(chosen);
+
+        if (chosenAt < minuteOf(Date.now())) {
+            return this._t("schedulePast", "That time has already passed.");
+        }
+
+        // Still to come, but too soon to be a schedule. This is the band the
+        // whole feature used to fall down: a person testing "does send later
+        // work" types the NEXT WHOLE MINUTE, which is almost always under
+        // ScheduledSendResolver::MIN_SECONDS away. The old check only asked
+        // whether the time had passed, so that click sailed through the browser,
+        // was refused by the resolver, and came back as a root-level form error
+        // the compose window had nowhere to render — no toast, no message, no
+        // schedule. Refusing it here is what makes the common case legible.
+        if (chosenAt < this._floor()) {
+            return this._t("scheduleTooSoon", "Pick a time at least a minute from now.");
+        }
+
+        if (chosenAt > this._instant(zoneHorizon(this.timezoneValue, this.maxDaysValue))) {
+            return this._t("scheduleTooFar", "Mail can be held for at most %days% days.")
+                .replace("%days%", String(this.maxDaysValue));
+        }
+
+        return null;
+    }
 
     /**
      * The earliest MINUTE the server will still accept, as an instant.

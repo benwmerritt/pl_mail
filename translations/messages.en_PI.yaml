@@ -1504,6 +1504,8 @@ calendar:
         day_one: '1 day'
         days: '%count% days'
         length: 'How long'
+        typed: 'Name a time: tue 3pm, 2 days…'
+        typed_unknown: 'That be no time I can read. Try tue 3pm or 2 days.'
     default_name: Cap'n's own
     alert:
         mail:
