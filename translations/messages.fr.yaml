@@ -1503,6 +1503,7 @@ admin:
 agent_forward:
     add_agent: "Ajouter un agent"
     agent_label: "Envoyer à"
+    agent_sealed: "Le courrier à cet agent serait chiffré ou signé. Utilisez Transférer."
     button: "Transférer à un agent"
     button_title: "Transférer cet e-mail à l’un de vos agents avec une note (Maj+F)"
     cancel: "Annuler"
@@ -1512,6 +1513,7 @@ agent_forward:
     note_label: "Votre note"
     note_placeholder: "Qu’en pensez-vous ?"
     pick_hint: "Alt+%n% choisit cet agent"
+    sealed: "Vos paramètres signent ou chiffrent ce que vous envoyez depuis cette adresse, ce que seule la fenêtre de rédaction sait faire. Utilisez Transférer pour l’envoyer vous-même."
     send_hint: "Ctrl/⌘+Entrée pour envoyer"
     sending: "Transfert à %name%"
     submit: "Envoyer à %name%"

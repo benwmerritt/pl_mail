@@ -1509,6 +1509,7 @@ admin:
 agent_forward:
     add_agent: "Agent hinzufügen"
     agent_label: "Senden an"
+    agent_sealed: "Mail an diesen Agenten würde verschlüsselt oder signiert. Nutze Weiterleiten."
     button: "An Agent weiterleiten"
     button_title: "Diese E-Mail mit einer Notiz an einen deiner Agenten weiterleiten (Shift+F)"
     cancel: "Abbrechen"
@@ -1518,6 +1519,7 @@ agent_forward:
     note_label: "Deine Notiz"
     note_placeholder: "Was hältst du davon?"
     pick_hint: "Alt+%n% wählt diesen Agenten"
+    sealed: "Deine Einstellungen signieren oder verschlüsseln, was du von dieser Adresse sendest, und das kann nur das Verfassen-Fenster. Nutze Weiterleiten, um sie selbst zu senden."
     send_hint: "Strg/⌘+Enter sendet"
     sending: "Wird an %name% weitergeleitet"
     submit: "An %name% senden"

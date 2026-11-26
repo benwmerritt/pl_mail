@@ -1415,6 +1415,7 @@ admin:
 agent_forward:
     add_agent: "Sign on a hand"
     agent_label: "Send to"
+    agent_sealed: "Letters to this hand would be sealed or signed. Use Pass it on."
     button: "Pass to a hand"
     button_title: "Pass this letter to one o' yer hands with a note (Shift+F)"
     cancel: "Belay that"
@@ -1424,6 +1425,7 @@ agent_forward:
     note_label: "Yer note"
     note_placeholder: "What d'ye make o' this?"
     pick_hint: "Alt+%n% picks this hand"
+    sealed: "Yer settings seal or sign what ye send from this address, and only the scribblin' window can do that. Use Pass it on to send it yerself."
     send_hint: "Ctrl/⌘+Enter casts off"
     sending: "Passin' to %name%"
     submit: "Send to %name%"

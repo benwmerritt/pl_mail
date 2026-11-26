@@ -7,6 +7,7 @@ namespace App\Controller\Mail;
 use App\Controller\ChecksCsrf;
 use App\Controller\RendersTurboStreams;
 use App\Domain\DTO\Mail\ComposeContext;
+use App\Domain\DTO\Mail\ForwardAgent;
 use App\Entity\Mail\Message;
 use App\Entity\User\User;
 use App\Security\Voter\OwnershipVoter;
@@ -53,10 +54,17 @@ final class AgentForwardController extends AbstractController
     {
         $this->denyAccessUnlessGranted(OwnershipVoter::OWN, $message);
 
+        $user   = $this->currentUser();
+        $agents = $this->agents->all($user);
+
         return $this->render('mail/_agent_forward_dialog.html.twig', [
-            'message'     => $message,
-            'agents'      => $this->agents->all($this->currentUser()),
-            'forwardable' => $this->forwarder->canForward($message),
+            'message' => $message,
+            'agents'  => $agents,
+            'sealed'  => array_values(array_map(
+                static fn (ForwardAgent $agent): string => $agent->address,
+                array_filter($agents, fn (ForwardAgent $agent): bool => $this->forwarder->sealsFor($user, $agent)),
+            )),
+            'refusal' => $this->forwarder->refusal($message, $user),
         ]);
     }
 

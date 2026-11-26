@@ -14,10 +14,11 @@ Hand-written into the modal frame for the reason insight/_report_dialog gives:
 one field posted as JSON has no FormView behind it.
 
 Variables:
-  message      Message being handed off
-  agents       list<ForwardAgent>
-  forwardable  bool — false for encrypted mail, whose quote only the composer
-               can decrypt
+  message  Message being handed off
+  agents   list<ForwardAgent>
+  sealed   list<string> — addresses of agents the composer would encrypt or
+           sign to, shown but not offered (AgentForwarder::sealsFor)
+  refusal  null | AgentForwarder::REFUSED_* — why nothing can be sent from here
 #}
 {% extends '_layout/app.html.twig' %}
 
@@ -27,10 +28,12 @@ Variables:
 
     {% set settingsUrl = path('app_settings_page', { page: 'compose' }) ~ '#card-forward-agents' %}
 
-    {% if agents is empty or not forwardable %}
+    {% set offered = agents|filter(agent => agent.address not in sealed) %}
+
+    {% if agents is empty or refusal is not null %}
         <div class="px-6 pb-6 space-y-4">
             <p class="text-sm text-ink-soft leading-relaxed">
-                {{ (forwardable ? 'agent_forward.empty' : 'agent_forward.encrypted')|trans }}
+                {{ ({ encrypted: 'agent_forward.encrypted', sealed: 'agent_forward.sealed' }[refusal] ?? 'agent_forward.empty')|trans }}
             </p>
 
             <div class="flex items-center justify-end gap-2">
@@ -41,7 +44,7 @@ Variables:
                                focus:outline-none focus-visible:ring-2 focus-visible:ring-accent
                                transition-colors duration-100">{{ 'agent_forward.cancel'|trans }}</button>
 
-                {% if forwardable %}
+                {% if refusal is null %}
                     <a href="{{ settingsUrl }}"
                        data-turbo-frame="_top"
                        class="inline-flex items-center justify-center h-8 px-3.5 rounded-lg text-sm font-medium text-accent-ink
@@ -68,8 +71,10 @@ Variables:
                     <legend class="mb-1.5 text-xs font-medium text-ink-soft">{{ 'agent_forward.agent_label'|trans }}</legend>
 
                     {% for agent in agents %}
-                        <label class="flex items-center gap-3 px-3 py-2 rounded-lg border border-line cursor-pointer
-                                      hover:bg-hover has-[:checked]:border-accent has-[:checked]:bg-accent-soft
+                        {% set isSealed = agent.address in sealed %}
+                        <label class="flex items-center gap-3 px-3 py-2 rounded-lg border border-line
+                                      {{ isSealed ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-hover' }}
+                                      has-[:checked]:border-accent has-[:checked]:bg-accent-soft
                                       transition-colors duration-100">
                             <input type="radio"
                                    name="agent"
@@ -77,11 +82,15 @@ Variables:
                                    data-mail--agent-forward-target="agent"
                                    data-name="{{ agent.name }}"
                                    data-action="change->mail--agent-forward#pick"
-                                   {{ loop.first ? 'checked' }}
+                                   {{ isSealed ? 'disabled' }}
+                                   {{ offered is not empty and agent.address == (offered|first).address ? 'checked' }}
                                    class="size-4 shrink-0 accent-accent focus:ring-2 focus:ring-accent">
                             <span class="min-w-0 flex-1">
                                 <span class="block text-sm font-medium text-ink truncate">{{ agent.name }}</span>
                                 <span class="block text-xs text-ink-faint truncate">{{ agent.address }}</span>
+                                {% if isSealed %}
+                                    <span class="block text-xs text-ink-muted">{{ 'agent_forward.agent_sealed'|trans }}</span>
+                                {% endif %}
                             </span>
                             {% if agents|length > 1 %}
                                 <kbd class="shrink-0 rounded border border-line bg-raised px-1.5 py-0.5 font-mono text-[11px] text-ink-muted"
@@ -120,6 +129,7 @@ Variables:
                                transition-colors duration-100">{{ 'agent_forward.cancel'|trans }}</button>
 
                 <button type="button"
+                        {{ offered is empty ? 'disabled' }}
                         data-mail--agent-forward-target="submit"
                         data-label="{{ 'agent_forward.submit'|trans({ '%name%': '__name__' }) }}"
                         data-action="click->mail--agent-forward#submit"
@@ -128,7 +138,7 @@ Variables:
                                focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1
                                transition-colors duration-100">
                     <i class="fa-solid fa-paper-plane text-xs" aria-hidden="true"></i>
-                    <span data-mail--agent-forward-target="submitLabel">{{ 'agent_forward.submit'|trans({ '%name%': agents|first.name }) }}</span>
+                    <span data-mail--agent-forward-target="submitLabel">{{ 'agent_forward.submit'|trans({ '%name%': offered is empty ? '…' : (offered|first).name }) }}</span>
                 </button>
             </div>
         </div>

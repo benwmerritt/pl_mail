@@ -27,6 +27,10 @@ export default class extends Controller {
     static values = { url: String, token: String };
 
     keydown(event) {
+        if (event.isComposing) {
+            return;
+        }
+
         if ("Enter" === event.key && (event.metaKey || event.ctrlKey)) {
             event.preventDefault();
             this.submit();
@@ -42,7 +46,7 @@ export default class extends Controller {
 
         const radio = this.agentTargets[Number(digit[1]) - 1];
 
-        if (undefined !== radio) {
+        if (undefined !== radio && !radio.disabled) {
             event.preventDefault();
             radio.checked = true;
             this.pick();
@@ -91,7 +95,10 @@ export default class extends Controller {
 
         const stream = await response.text();
 
-        this.#closeDialog();
+        if (this.element.isConnected) {
+            this.#closeDialog();
+        }
+
         Turbo.renderStreamMessage(stream);
     }
 

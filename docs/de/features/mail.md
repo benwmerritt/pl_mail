@@ -1,4 +1,4 @@
-<!-- translated-from: features/mail.md sha1:5ccce396d05254a290b678ceb1ba1213f4abbd48 -->
+<!-- translated-from: features/mail.md sha1:cab600db4a3f080be55e3f2c5144fadb3143df40 -->
 
 # Mail
 
@@ -1010,7 +1010,6 @@ kennen:
 | `t` | Zwischen Konversationen und einzelnen E-Mails wechseln. |
 | `l` · `v` · `b` | Label vergeben · verschieben nach · zurückstellen. |
 | `r` · `a` · `f` | Antworten · allen antworten · weiterleiten, in einer geöffneten Unterhaltung. |
-| `Shift`+`f` | An einen Agenten weiterleiten, in einer geöffneten Unterhaltung. |
 | `c` · `/` | Neue Nachricht schreiben · suchen. |
 | `g` dann `i` `s` `t` `d` `a` | Zum Posteingang, zu Markiert, Gesendet, den Entwürfen, zum Archiv. |
 | `z` | Die letzte Aktion rückgängig machen, solange ihr Hinweis noch zu sehen ist. |
@@ -1677,25 +1676,6 @@ lässt alles, wie es war. Solange du anordnest, verschiebt ein Druck auf einen K
 tun, was er sonst tut. Die Reihenfolge gilt für dich, in jedem Schreibfenster und auf jedem Gerät,
 auf dem du dich anmeldest, und Knöpfe, die nicht passen, wandern weiterhin vom rechten Ende deiner
 Reihenfolge in die **⋮**.
-
-## An einen Agenten weiterleiten
-
-Ein Agent ist alles, was E-Mails liest und etwas damit tut: ein Bot, ein Assistent, ein Relay.
-**An Agent weiterleiten**, neben **Weiterleiten** unter einer geöffneten E-Mail und im **⋮**-Menü
-einer Nachricht, schickt diese E-Mail mit einer Notiz von dir an einen deiner Agenten, in einem
-Zug. `Shift`+`f` öffnet es über die Tastatur.
-
-Im Dialog steht der Cursor schon in der Notiz, und dein erster Agent ist ausgewählt. Schreib, was du
-willst, etwa „was hältst du davon?“, und drück Strg+Enter (⌘+Enter auf dem Mac) oder **An … senden**.
-`Alt`+`1` bis `9` wählt einen anderen Agenten, ohne die Notiz zu verlassen. Die Weiterleitung geht
-von dem Konto aus, in dem die E-Mail liegt, mit deiner Notiz über der weitergeleiteten Nachricht und
-ihren Anhängen, genau so, wie **Weiterleiten** sie schicken würde. Sie wartet vorher zehn Sekunden
-wie jedes Senden, und **Rückgängig** in der Meldung öffnet sie stattdessen in einem Verfassen-Fenster.
-
-Deine Agenten stehen unter **Einstellungen → Verfassen → An Agent weiterleiten**: je ein Name und
-eine Adresse, bis zu neun, in der Reihenfolge, in der der Dialog sie zeigt. Der Dialog sendet nur
-an eine Adresse auf dieser Liste. Eine verschlüsselte E-Mail lässt sich so nicht weiterleiten, weil
-nur das Verfassen-Fenster ihr Zitat entschlüsseln kann; nimm dafür **Weiterleiten**.
 
 ## Lesebestätigungen
 

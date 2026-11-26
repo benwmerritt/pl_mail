@@ -27,7 +27,8 @@ use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
  *   - an address that is not on the sender's own list is refused, so the
  *     endpoint cannot mail a stranger;
  *   - a stranger's mail cannot be forwarded, and a send without the token
- *     queues nothing.
+ *     queues nothing;
+ *   - a send the composer would sign or encrypt is not made from here.
  *
  * Fixtures follow InsightReportTest: a fresh user inside a transaction that is
  * never committed.
@@ -150,6 +151,30 @@ final class AgentForwardTest extends WebTestCase
             $crawler->filter('input[name="agent"]')->each(static fn ($input): string => (string) $input->attr('value')),
         );
         self::assertNotNull($crawler->filter('input[name="agent"]')->first()->attr('checked'));
+    }
+
+    public function testWhenEverythingSentIsSignedNothingIsSentFromHere(): void
+    {
+        $client  = $this->signIn();
+        $message = $this->message();
+        $token   = $this->token($client, $message);
+
+        $this->user->signPlainMail = true;
+        $this->em->flush();
+
+        $crawler = $client->request('GET', "/mail/forward-to-agent/{$message->id}");
+
+        self::assertCount(0, $crawler->filter('[data-controller="mail--agent-forward"]'), 'the dialog offered a send the composer would have signed');
+
+        $client->request(
+            'POST',
+            "/mail/forward-to-agent/{$message->id}",
+            server: ['CONTENT_TYPE' => 'application/json', 'HTTP_X-CSRF-Token' => $token],
+            content: (string) json_encode(['agent' => self::AGENT, 'note' => '']),
+        );
+
+        self::assertSame(422, $client->getResponse()->getStatusCode());
+        self::assertSame([], $this->queued());
     }
 
     public function testWithoutAgentsTheDialogPointsToSettings(): void

@@ -1359,6 +1359,7 @@ admin:
 agent_forward:
     add_agent: "添加代理"
     agent_label: "发送给"
+    agent_sealed: "发给此代理的邮件会被加密或签名。请使用“转发”。"
     button: "转发给代理"
     button_title: "附上备注，将这封邮件转发给你的某个代理（Shift+F）"
     cancel: "取消"
@@ -1368,6 +1369,7 @@ agent_forward:
     note_label: "你的备注"
     note_placeholder: "你怎么看？"
     pick_hint: "Alt+%n% 选择此代理"
+    sealed: "你的设置会对从此地址发出的邮件签名或加密，而这只能在撰写窗口中完成。请使用“转发”自行发送。"
     send_hint: "Ctrl/⌘+Enter 发送"
     sending: "正在转发给 %name%"
     submit: "发送给 %name%"

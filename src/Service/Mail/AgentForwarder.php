@@ -6,9 +6,12 @@ namespace App\Service\Mail;
 
 use App\Controller\Mail\ComposeController;
 use App\Domain\DTO\Mail\ForwardAgent;
+use App\Domain\Enum\Crypto\RecipientPolicy;
+use App\Entity\Mail\Account;
 use App\Entity\Mail\Message;
 use App\Entity\User\User;
 use App\Infrastructure\Messaging\Message\SendMessageMessage;
+use App\Service\Crypto\RecipientKeys;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -23,12 +26,19 @@ use Symfony\Component\Messenger\Stamp\DelayStamp;
  * so a hand-off is an ordinary forward in every way that matters afterwards:
  * it sits in Sent, it threads, and its Undo reopens it in the compose dock.
  *
- * Encrypted mail is refused rather than forwarded. Its quote is decrypted in
- * the browser by the composer, and a forward built here would carry a marker
- * where the mail should be.
+ * Forwards only the browser composer can make are refused rather than sent:
+ * encrypted mail, whose quote it decrypts, and a send it would sign or
+ * encrypt — "sign plain mail", "always encrypt" for the address it goes from,
+ * or an agent whose address has a key or its own Always policy. Sent from
+ * here, the first would carry a marker where the mail should be and the rest
+ * would go out in the clear without saying so.
  */
 final readonly class AgentForwarder
 {
+    public const string REFUSED_ENCRYPTED = 'encrypted';
+
+    public const string REFUSED_SEALED = 'sealed';
+
     public function __construct(
         private ReplyDraftBuilder      $replyDrafts,
         private DraftPersister         $drafts,
@@ -37,12 +47,48 @@ final readonly class AgentForwarder
         private SenderResolver         $senders,
         private MessageBusInterface    $bus,
         private EntityManagerInterface $entityManager,
+        private RecipientKeys          $recipientKeys,
     ) {
     }
 
-    public function canForward(Message $original): bool
+    /**
+     * Why this mail cannot be forwarded to an agent from here, as one of the
+     * REFUSED_ constants, or null when it can.
+     */
+    public function refusal(Message $original, User $user): ?string
     {
-        return true !== $original->crypto?->isEncrypted();
+        if (true === $original->crypto?->isEncrypted()) {
+            return self::REFUSED_ENCRYPTED;
+        }
+
+        $account = $this->sendingAccount($original, $user);
+
+        if (true === self::sealsWhatItSends($user, (string) ($account->displayAddress ?? $account->email ?? ''))) {
+            return self::REFUSED_SEALED;
+        }
+
+        return null;
+    }
+
+    /**
+     * Whether the composer would encrypt or sign mail to this agent, which a
+     * forward from here cannot. The keys plMail already holds, without looking
+     * one up: the composer's lookup happens as an address is typed, and an
+     * agent picked from a list was never typed.
+     */
+    public function sealsFor(User $user, ForwardAgent $agent): bool
+    {
+        foreach ($this->recipientKeys->describe($user, [$agent->address], false) as $recipient) {
+            if (RecipientPolicy::Always->value === $recipient['encrypt'] || RecipientPolicy::Always->value === $recipient['sign']) {
+                return true;
+            }
+
+            if (RecipientPolicy::Never->value !== $recipient['encrypt'] && (null !== $recipient['key'] || null !== $recipient['smime'])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -52,9 +98,9 @@ final readonly class AgentForwarder
      */
     public function forward(Message $original, ForwardAgent $agent, string $note, User $user): ?Message
     {
-        $account = $original->account ?? $this->window->defaultAccountFor($user);
+        $account = $this->sendingAccount($original, $user);
 
-        if (null === $account || false === $this->canForward($original)) {
+        if (null === $account || null !== $this->refusal($original, $user) || true === $this->sealsFor($user, $agent)) {
             return null;
         }
 
@@ -63,6 +109,10 @@ final readonly class AgentForwarder
         $draft->bodyHtml    = self::withNote($note, (string) $draft->bodyHtml);
 
         $sender = $this->senders->addressFor($this->senders->tokenFor($draft, $account), $account, $user);
+
+        if (true === self::sealsWhatItSends($user, $sender)) {
+            return null;
+        }
 
         // Saved before the files are copied and again after, as the composer
         // does across opening a forward and pressing Send: the bytes are
@@ -83,6 +133,24 @@ final readonly class AgentForwarder
         );
 
         return $draft;
+    }
+
+    /**
+     * The account the mail is in, as a forward from the composer would use,
+     * unless that account only receives; then the one a new message would go
+     * from.
+     */
+    private function sendingAccount(Message $original, User $user): ?Account
+    {
+        return true === $original->account->sendEnabled
+            ? $original->account
+            : $this->window->defaultAccountFor($user);
+    }
+
+    private static function sealsWhatItSends(User $user, string $from): bool
+    {
+        return true === $user->signPlainMail
+            || 'always' === ($user->ownAddressEncrypt[strtolower(trim($from))] ?? null);
     }
 
     /**

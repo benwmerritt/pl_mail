@@ -1494,6 +1494,7 @@ admin:
 agent_forward:
     add_agent: "Add an agent"
     agent_label: "Send to"
+    agent_sealed: "Mail to this agent would be encrypted or signed. Use Forward."
     button: "Forward to agent"
     button_title: "Forward this email to one of your agents with a note (Shift+F)"
     cancel: "Cancel"
@@ -1503,6 +1504,7 @@ agent_forward:
     note_label: "Your note"
     note_placeholder: "What do you think of this?"
     pick_hint: "Alt+%n% picks this agent"
+    sealed: "Your settings sign or encrypt what you send from this address, and only the compose window can do that. Use Forward to send it yourself."
     send_hint: "Ctrl/⌘+Enter sends"
     sending: "Forwarding to %name%"
     submit: "Send to %name%"
