@@ -112,7 +112,7 @@ self-contained: no {% extends %}, no block dependencies.
             {% include '_partials/_spam_menu.html.twig' with { threadId: thread.id, variant: 'toolbar' } only %}
         {% endif %}
 
-        {{ tbtn('click->mail--message-actions#markUnread', 'fa-regular fa-envelope', 'toolbar.actions.mark_unread'|trans) }}
+        {{ tbtn('click->mail--message-actions#markUnread', 'fa-solid fa-envelope', 'toolbar.actions.mark_unread'|trans) }}
 
         {# Pin (#654), where the row offers it: not for mail in the bin or
            spam, whose pins those places take off. A toggle that says which

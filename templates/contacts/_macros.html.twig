@@ -11,7 +11,9 @@ route, whose stateless firewall answers a browser with a Basic "Sign in" box.
              alt="" loading="lazy"
              class="{{ cls }} rounded-full object-cover shrink-0">
     {% else %}
-        <span class="{{ cls }} rounded-full bg-accent-soft text-accent inline-flex items-center justify-center font-semibold shrink-0"
+        {% set emails = contact.emails ?? [] %}
+        {% set primary = emails|filter(e => e.isPrimary)|first ?: emails|first %}
+        <span class="{{ cls }} rounded-full {{ (primary ? primary.email : contact.displayName)|avatar_tone }} inline-flex items-center justify-center font-semibold shrink-0"
               aria-hidden="true">{{ contact.displayName|slice(0, 1)|upper }}</span>
     {% endif %}
 {% endmacro %}

@@ -218,8 +218,7 @@ inRelations (ones pointing at it), refEmails (ReferenceEmailFinder rows).
 
             {# ── Reference emails ── #}
             <section class="{{ cardCls }}">
-                <h3 class="text-sm font-semibold text-ink mb-1">{{ 'contacts.reference_emails'|trans }}</h3>
-                <p class="text-xs text-ink-faint mb-3">{{ 'contacts.reference_emails_hint'|trans }}</p>
+                <h3 class="text-sm font-semibold text-ink mb-3">{{ 'contacts.reference_emails'|trans }}</h3>
                 {% if refEmails is empty %}
                     <p class="text-sm text-ink-faint">{{ 'contacts.reference_emails_empty'|trans }}</p>
                 {% else %}
@@ -241,7 +240,7 @@ inRelations (ones pointing at it), refEmails (ReferenceEmailFinder rows).
                                         </span>
                                         <span class="block truncate text-xs text-ink-faint">
                                             {{ row.fromName ?: row.fromAddress }}
-                                            {% if row.receivedAt %} · {{ row.receivedAt|date('M j, Y H:i') }}{% endif %}
+                                            {% if row.receivedAt %} · {{ row.receivedAt|intl_date('dMMMy') }}, {{ row.receivedAt|date(clock.time) }}{% endif %}
                                         </span>
                                     </span>
                                     {% if row.hasAttachment %}
