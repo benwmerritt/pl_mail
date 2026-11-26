@@ -336,8 +336,8 @@ somewhere you cannot see says so and names the calendar.
 
 ### Calendar sets
 
-**A button shows which calendars are on**, as their colour dots and the name of the set showing. On
-the calendar page it sits beside New event; in the docked pane, along the pane's bottom edge. Its menu lists every calendar, grouped by the account it comes from, with a tick
+**A button shows which calendars are on**, as their colour dots and the name of the set showing. It
+sits along the bottom edge of the calendar, on the calendar page and in the docked pane. Its menu lists every calendar, grouped by the account it comes from, with a tick
 for each one showing; ticking one shows or hides it straight away, the same as the eye in
 **Settings → Calendars**.
 

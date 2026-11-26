@@ -1,14 +1,16 @@
 {#
-The calendar toolbar's sets menu: which calendars are showing, the sets that
-switch between groups of them, and saving what is showing as a set.
+The calendar's sets bar, along the bottom edge of the calendar page and the
+docked pane: which calendars are showing, the sets that switch between groups
+of them, and saving what is showing as a set. It is not in the toolbar because
+the pane and a phone have no room left in that row.
 
 Every form posts to CalendarSetController and comes back to `returnUrl`. Inside
 the docked pane the forms are inside its Turbo Frame, so only the pane redraws.
 Ticking a calendar comes back with `sets=1`, which reopens the menu so several
 can be ticked in a row, and `focus`, which puts focus back on the row ticked.
 
-The menu opens in the top layer (`place: above`), because the docked pane
-clips anything that overflows it.
+The menu opens in the top layer (`place: above`), above the bar, because the
+docked pane clips anything that overflows it.
 
 Variables:
   returnUrl  string  the page to come back to
@@ -19,20 +21,20 @@ Variables:
 {% set focusId = app.request.query.getInt('focus') %}
 {% set token = csrf_token(constant('App\\Controller\\Calendar\\CalendarSetController::CSRF')) %}
 
-<div class="relative shrink-0" data-controller="ui--dropdown" data-ui--dropdown-place-value="above" data-calendar-sets
+<div class="shrink-0 flex items-center px-2 py-1 border-t border-line">
+<div class="relative" data-controller="ui--dropdown" data-ui--dropdown-place-value="above" data-calendar-sets
      {% if app.request.query.getBoolean('sets') %}data-ui--dropdown-open-value="true"{% endif %}>
     <button type="button"
             data-action="click->ui--dropdown#toggle"
             title="{{ 'calendar.sets.title'|trans({'%count%': menu.visible|length, '%total%': menu.total}) }}"
-            class="flex items-center gap-1.5 h-8 px-2 rounded-lg text-xs text-ink-muted hover:bg-hover hover:text-ink transition-colors cursor-pointer
-                   @max-[37rem]/toolbar:h-7 @max-[37rem]/toolbar:px-1.5 @max-[22rem]/toolbar:h-6">
+            class="flex items-center gap-1.5 h-7 px-1.5 rounded-lg text-xs text-ink-muted hover:bg-hover hover:text-ink transition-colors cursor-pointer">
         <span class="flex items-center" aria-hidden="true">
             {% for calendar in menu.visible|slice(0, 4) %}
                 <span class="w-2 h-2 rounded-full {{ loop.first ? '' : '-ml-0.5' }}"
                       style="background-color: {{ calendar.color }}"></span>
             {% endfor %}
         </span>
-        <span class="max-w-28 truncate @max-[22rem]/toolbar:sr-only" data-calendar-set-label>{{ label }}</span>
+        <span class="max-w-40 truncate" data-calendar-set-label>{{ label }}</span>
         <i class="fa-solid fa-chevron-down text-[9px]" aria-hidden="true"></i>
     </button>
 
@@ -121,4 +123,5 @@ Variables:
                class="px-1 text-[11px] text-ink-faint hover:text-ink">{{ 'calendar.sets.manage'|trans }}</a>
         </div>
     </div>
+</div>
 </div>

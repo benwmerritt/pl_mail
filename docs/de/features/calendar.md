@@ -1,4 +1,4 @@
-<!-- translated-from: features/calendar.md sha1:abb1f6b58ec481354228f58527a073e15e7cc291 -->
+<!-- translated-from: features/calendar.md sha1:e352de7b3d2b80b8155e2e1fd6553287a71ab613 -->
 
 # Kalender
 
@@ -373,8 +373,8 @@ Kalender.
 ### Kalender-Sets
 
 **Eine Schaltfläche zeigt, welche Kalender an sind**, als ihre Farbpunkte und mit dem Namen des
-angezeigten Sets. Auf der Kalenderseite sitzt sie neben Neuer Termin, in der angedockten Fläche an
-deren unterem Rand. Ihr Menü listet jeden Kalender, nach dem Konto gruppiert, aus dem
+angezeigten Sets. Sie sitzt am
+unteren Rand des Kalenders, auf der Kalenderseite wie in der angedockten Fläche. Ihr Menü listet jeden Kalender, nach dem Konto gruppiert, aus dem
 er kommt, mit einem Häkchen bei jedem angezeigten; ein Klick blendet ihn sofort ein oder aus, genau
 wie das Auge unter **Einstellungen → Kalender**.
 
