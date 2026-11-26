@@ -200,6 +200,9 @@ export default class extends Controller {
     connect() {
         this._listUrl = this.openValue ? null : window.location.href;
         this._selectedPath = null;
+        // Counts the reader's own moves — opening, closing, Back — so an
+        // auto-advance still loading can tell it has been overtaken. See leaving().
+        this._navigation = 0;
         this._onPopState = this._handlePopState.bind(this);
         window.addEventListener("popstate", this._onPopState);
 
@@ -407,6 +410,7 @@ export default class extends Controller {
     }
 
     async _openUrl(url) {
+        this._navigation++;
         const fromContacts = this._contactsFull();
 
         // Remember where to go back to, if we don't already know. Not the full
@@ -455,6 +459,8 @@ export default class extends Controller {
             event.preventDefault();
         }
 
+        this._navigation++;
+
         // The URL moves back to the list BEFORE the list is shown, because
         // showing it may have to fetch it and _refreshList asks for wherever the
         // page currently is. The other way round it would fetch the thread's own
@@ -497,11 +503,27 @@ export default class extends Controller {
         }
 
         const left = this._selectedPath;
+        const navigation = this._navigation;
+
+        // Somebody went Back or opened something else while the write, or the
+        // next conversation, was on its way. Where they went is where they
+        // meant to be.
+        const current = () => navigation === this._navigation;
 
         return async () => {
-            // Somebody went Back or opened something else while the write was
-            // on its way. Where they went is where they meant to be.
-            if (left !== this._selectedPath) {
+            if (false === current() || left !== this._selectedPath) {
+                return;
+            }
+
+            const shown = await this._loadMessage(next, current);
+
+            if (false === current()) {
+                return;
+            }
+
+            if (false === shown) {
+                this.close();
+
                 return;
             }
 
@@ -511,18 +533,13 @@ export default class extends Controller {
             // the folder's.
             const replace = window.location.pathname === left;
 
-            if (false === await this._loadMessage(next)) {
-                this.close();
-
-                return;
-            }
-
             history[replace ? "replaceState" : "pushState"]({ mailPaneOpen: true }, "", next);
         };
     }
 
     async _handlePopState(event) {
         const state = event.state;
+        this._navigation++;
 
         // Back to the full contacts page a message was opened from. That entry
         // is Turbo's, and Turbo restores the page; a list fetched here for its
@@ -540,8 +557,13 @@ export default class extends Controller {
         }
     }
 
-    /** @returns {Promise<boolean>} whether the message was put in the pane */
-    async _loadMessage(url) {
+    /**
+     * @param {string} url
+     * @param {() => boolean} current  false once the answer is no longer wanted,
+     *        which leaves the pane as it is
+     * @returns {Promise<boolean>} whether the message was put in the pane
+     */
+    async _loadMessage(url, current = () => true) {
         let response;
 
         try {
@@ -555,12 +577,21 @@ export default class extends Controller {
             return false;
         }
 
+        if (false === current()) {
+            return false;
+        }
+
         if (!response.ok) {
             window.location.href = url; // fall back to a real navigation on failure
             return false;
         }
 
         const html = await response.text();
+
+        if (false === current()) {
+            return false;
+        }
+
         this.readingTarget.innerHTML = html;
         this._showReading();
         this._markSelected(new URL(url, window.location.href).pathname);
