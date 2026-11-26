@@ -333,8 +333,7 @@ test.describe("counters after a change nobody announced", () => {
         const window_ = page.locator("#compose_dock .compose-window");
         await expect(window_).toBeVisible();
 
-        await window_.locator('input[type="text"], input[type="email"]').first()
-            .fill("counts@example.test");
+        await window_.locator(".ts-control input").first().fill("counts@example.test");
         await window_.locator('input[name*="[subject]"]').first().fill(subject);
         await window_.locator('[data-compose--compose-toolbar-target="editor"]').first()
             .fill("A draft the sidebar has to hear about.");

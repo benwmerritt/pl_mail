@@ -41,8 +41,7 @@ test.describe("send closes the composer and puts the undo in a toast", () => {
         const window_ = page.locator(`${DOCK} .compose-window`);
         await expect(window_).toBeVisible();
 
-        await window_.locator('input[type="text"], input[type="email"]').first()
-            .fill("optimistic@example.test");
+        await window_.locator(".ts-control input").first().fill("optimistic@example.test");
         await window_.locator('input[name*="[subject]"]').first().fill("E2E Optimistic");
         await window_.locator('[data-compose--compose-toolbar-target="editor"]').first()
             .fill("Body");
@@ -95,8 +94,7 @@ test.describe("send closes the composer and puts the undo in a toast", () => {
         const window_ = page.locator(`${DOCK} .compose-window`);
         await expect(window_).toBeVisible();
 
-        await window_.locator('input[type="text"], input[type="email"]').first()
-            .fill("optimistic@example.test");
+        await window_.locator(".ts-control input").first().fill("optimistic@example.test");
         await window_.locator('input[name*="[subject]"]').first().fill("E2E Undo Me");
         await window_.locator('[data-compose--compose-toolbar-target="editor"]').first()
             .fill("Body");
@@ -176,8 +174,7 @@ test.describe("send closes the composer and puts the undo in a toast", () => {
         const window_ = page.locator(`${DOCK} .compose-window`);
         await expect(window_).toBeVisible();
 
-        await window_.locator('input[type="text"], input[type="email"]').first()
-            .fill("optimistic@example.test");
+        await window_.locator(".ts-control input").first().fill("optimistic@example.test");
         await window_.locator('input[name*="[subject]"]').first().fill("E2E Busy Pill");
         await window_.locator('[data-compose--compose-toolbar-target="editor"]').first()
             .fill("Body");
@@ -226,7 +223,7 @@ test.describe("send closes the composer and puts the undo in a toast", () => {
             (r) => /\/compose\/draft/.test(r.url()) && r.request().method() === "POST",
         );
         // Committed as a chip, so the saved draft has its recipient.
-        const to = window_.locator('input[type="text"], input[type="email"]').first();
+        const to = window_.locator(".ts-control input").first();
         await to.fill("optimistic@example.test");
         await to.press("Enter");
         await window_.locator('input[name*="[subject]"]').first().fill("E2E Sent From Drafts");
