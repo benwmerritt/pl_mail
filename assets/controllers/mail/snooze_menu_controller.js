@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 import { fromWallClock, snoozeOptions, toWallClock } from "../../snooze_options.js";
 import { prefersHour12 } from "../../clock_format.js";
+import { readTypedTime } from "../../typed_time.js";
 
 /**
  * Fills a snooze menu with concrete wake times.
@@ -24,6 +25,10 @@ import { prefersHour12 } from "../../clock_format.js";
  * handler on every surface. The one thing added on top is the refusal of a
  * moment already gone, which runs as the button's first action and stops the
  * surface's own from running at all.
+ *
+ * A time can be typed as well (BMAIL-12): the field at the top reads "tue 3pm"
+ * or "2 days" on the same browser clock, and what it understood is shown as one
+ * more option with the same `until` param. Enter in the field presses it.
  */
 /**
  * One formatter per shape, kept: `toLocaleString` with options builds a new
@@ -53,12 +58,13 @@ function formatter(withDate) {
 }
 
 export default class extends Controller {
-    static targets = ["option", "toggle", "custom", "input", "confirm", "error"];
+    static targets = ["option", "toggle", "custom", "input", "confirm", "error", "typed", "reading", "unread"];
 
     static values = {
         // Translated server-side, as every string this app writes from
         // JavaScript is.
         past: { type: String, default: "That time has already passed." },
+        unknown: { type: String, default: "Not a time I can read." },
     };
 
     // No connect(). It used to refresh here as well as on every open, and the
@@ -95,6 +101,71 @@ export default class extends Controller {
         }
 
         this.#fold();
+        this.focusTyped();
+    }
+
+    /**
+     * Into the field, where there is a keyboard to type with: `b` and then
+     * the time. On a phone the keyboard would cover the menu to offer what a
+     * tap on a preset does. Called again by mail--row-menus once its menu is
+     * showing, since a hidden field takes no focus.
+     *
+     * @returns {boolean} whether the field has the focus
+     */
+    focusTyped() {
+        if (false === this.hasTypedTarget || false === window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+            return false;
+        }
+
+        this.typedTarget.focus();
+
+        return document.activeElement === this.typedTarget;
+    }
+
+    /** What has been typed so far, read: the option it names, or why there is none. */
+    read() {
+        const text = this.typedTarget.value.trim();
+        const at   = fromWallClock("" === text ? null : readTypedTime(text, toWallClock));
+        const past = null !== at && at <= new Date();
+
+        this.readingTarget.hidden = null === at || past;
+        this.unreadTarget.hidden  = "" === text || false === this.readingTarget.hidden;
+        this.unreadTarget.textContent = past ? this.pastValue : this.unknownValue;
+
+        if (false === this.readingTarget.hidden) {
+            this.readingTarget.querySelector("[data-typed-when]").textContent = this.#format(at);
+            this.#until(this.readingTarget, at);
+        }
+    }
+
+    /**
+     * Enter takes what was read. Every Enter stops here, Ctrl/Cmd+Enter too:
+     * a menu inside a compose window would otherwise hand it to compose's send.
+     */
+    take(event) {
+        if ("Enter" !== event.key || event.isComposing) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (false === this.readingTarget.hidden) {
+            this.readingTarget.click();
+        }
+    }
+
+    /**
+     * Read again as the typed option is taken, ahead of the surface's own
+     * action: "today 5pm" left open past five, or "in 2 hours" taken a while
+     * after it was typed, is not what the option said when it was drawn.
+     */
+    recheck(event) {
+        this.read();
+
+        if (true === this.readingTarget.hidden) {
+            event.stopImmediatePropagation();
+        }
     }
 
     /**
@@ -206,6 +277,11 @@ export default class extends Controller {
      * for the last one, nor its refusal.
      */
     #fold() {
+        if (true === this.hasTypedTarget) {
+            this.typedTarget.value = "";
+            this.read();
+        }
+
         if (false === this.hasCustomTarget) {
             return;
         }

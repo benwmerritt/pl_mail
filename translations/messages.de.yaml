@@ -1598,6 +1598,8 @@ calendar:
         day_one: '1 Tag'
         days: '%count% Tage'
         length: 'Dauer'
+        typed: 'Zeit eingeben: di 15 Uhr, 2 Tage…'
+        typed_unknown: 'Diese Zeit kann ich nicht lesen. Versuch di 15 Uhr oder 2 Tage.'
     default_name: Persönlich
     alert:
         mail:

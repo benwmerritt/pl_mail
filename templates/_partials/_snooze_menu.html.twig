@@ -51,11 +51,39 @@
      {% endif %}
      hidden
      data-controller="mail--snooze-menu"
-     data-mail--snooze-menu-past-value="{{ 'snooze.past'|trans }}">
+     data-mail--snooze-menu-past-value="{{ 'snooze.past'|trans }}"
+     data-mail--snooze-menu-unknown-value="{{ 'calendar.when.typed_unknown'|trans }}">
 
     <p data-keep class="px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-ink-faint">
         {{ 'thread_row.actions.snooze'|trans }}
     </p>
+
+    {# A time typed rather than picked (BMAIL-12): "tue 3pm", "2 days". What it
+       was read as appears below as one more option, carrying the same `until`
+       param a preset does, and Enter in the field presses it. Focused on open
+       where there is a keyboard, so `b` and then the time is all it takes; see
+       mail--snooze-menu#read and assets/typed_time.js. #}
+    <div class="px-2 pt-1 pb-1">
+        <input type="text"
+               data-mail--snooze-menu-target="typed"
+               data-action="input->mail--snooze-menu#read keydown->mail--snooze-menu#take"
+               placeholder="{{ 'calendar.when.typed'|trans }}"
+               aria-label="{{ 'calendar.when.typed'|trans }}"
+               autocomplete="off" spellcheck="false" enterkeyhint="done"
+               class="h-7 w-full rounded-lg border border-field-border bg-field px-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+    </div>
+    <button type="button"
+            hidden
+            data-mail--snooze-menu-target="reading"
+            {% if url %}data-{{ controller }}-snooze-url-param="{{ url }}"{% endif %}
+            data-action="click->mail--snooze-menu#recheck {{ fire }}"
+            {% if shared %}role="menuitem"{% endif %}
+            class="w-full flex items-center justify-between gap-3 px-3 py-2 text-sm text-ink
+                   hover:bg-hover transition-colors text-left">
+        <span data-typed-when class="whitespace-nowrap tabular-nums"></span>
+        <kbd class="shrink-0 rounded border border-line bg-raised px-1.5 font-mono text-[11px] text-ink-muted" aria-hidden="true">↵</kbd>
+    </button>
+    <p data-mail--snooze-menu-target="unread" hidden class="px-3 py-1.5 text-xs text-ink-faint"></p>
 
     {% for key in ['later_today', 'tomorrow', 'this_weekend', 'next_week'] %}
         <button type="button"

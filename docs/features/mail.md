@@ -1165,6 +1165,13 @@ the coming Monday. All four are computed in your browser, because the server nev
 for the session and would otherwise resolve "tomorrow morning" to wherever the container thinks it
 is.
 
+Or type the time into the field at the top of the menu: *tue 3pm*, *2 days*, *next month*, *tomorrow
+9:30*, *in 3 hours*, or the same in German, *di 15 Uhr*, *2 Tage*, *morgen früh*. The time it was
+read as appears under the field, and **Enter** snoozes to it. A day without a time is 08:00, a bare
+hour from 1 to 7 is the afternoon one (*3* is 15:00, *3:00* is 03:00), *15h* and *15h30* are clock
+times, and a weekday is the next one after today. With a keyboard the field has the focus as the
+menu opens, so **b** and the time is all it takes.
+
 `app:mail:wake-snoozed` runs every minute and is what brings conversations back. A woken
 conversation is marked **unread** — that is the point of the feature, since a thread returning in
 the state you left it in is one you have already learned to scroll past. The read state it had is
@@ -1506,6 +1513,10 @@ The JMAP identities carry the same list as their `bcc`, so the apps can copy mai
 The chevron beside **Send** opens **Send later**: *Tomorrow morning* (08:00), *Tomorrow afternoon*
 (13:00), *Monday morning*, and **Pick date & time** for anything else. Tomorrow-is-Monday drops the
 third, because a menu offering one instant under two names is a menu you have to check.
+
+A time can be typed into the field at the top of the menu as well, read the way [Snooze](#snooze)
+reads it: what it was read as appears under the field, and **Enter** schedules it. **Enter** there
+never sends. A time outside the limits below says so instead.
 
 Every time is read on **your** clock — the timezone and the 12-or-24-hour format from
 **Settings → General → Language & region**, not the browser's — and the menu says which zone it means. A laptop still on

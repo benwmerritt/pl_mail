@@ -144,8 +144,18 @@ export default class extends Controller {
     }
 
     _handleEscape(event) {
-        if ("Escape" === event.key) {
-            this.close();
+        if ("Escape" !== event.key) {
+            return;
+        }
+
+        // Focus inside the menu (a menu that opens on its own field) would be
+        // left on a hidden element; it goes back to the button that opened it.
+        const inside = this.menuTarget.contains(document.activeElement);
+
+        this.close();
+
+        if (true === inside) {
+            this._anchor?.focus();
         }
     }
 

@@ -103,8 +103,10 @@ export default class extends Controller {
         window.addEventListener("scroll", this._onMove, { capture: true });
         window.addEventListener("resize", this._onMove);
 
-        if (true === keyboard) {
-            this.#items()[0]?.focus();
+        const typing = true === this.application.getControllerForElementAndIdentifier(panel, "mail--snooze-menu")?.focusTyped();
+
+        if (true === keyboard && false === typing) {
+            this.#items().find((item) => item instanceof HTMLButtonElement)?.focus();
         }
     }
 
@@ -294,9 +296,9 @@ export default class extends Controller {
         items[next].focus();
     }
 
-    /** The options on show, in order. */
+    /** The typed-time field and the options on show, in order, so the arrows come back round to the field. */
     #items() {
-        return [...this.snoozeTarget.querySelectorAll("button")].filter((button) => false === button.hidden);
+        return [...this.snoozeTarget.querySelectorAll("button, input[data-mail--snooze-menu-target='typed']")].filter((item) => false === item.hidden);
     }
 
     #spam() {
