@@ -1,0 +1,21 @@
+{#
+mail/_agent_forward_sent.stream.html.twig
+─────────────────────────────────────────────────────────────────────────────
+A hand-off to an agent, on its way: the toast a send from the composer gets,
+naming who it went to, with the same Undo for the same cancel window. Undo
+reopens the forward in the compose dock.
+
+Variables: agent (ForwardAgent), undoUrl, cancelWindow
+#}
+<turbo-stream action="append" target="toast-region">
+    <template>
+        {% include '_partials/_toast.html.twig' with {
+            type:    'success',
+            message: 'agent_forward.sending'|trans({ '%name%': agent.name }),
+            extra:   {
+                undo_url:   undoUrl,
+                hide_after: cancelWindow,
+            },
+        } only %}
+    </template>
+</turbo-stream>

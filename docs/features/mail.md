@@ -925,6 +925,7 @@ keyboard button above a mail list; the ones worth knowing first:
 | `t` | Switch between conversations and single emails. |
 | `l` · `v` · `b` | Label as · move to · snooze. |
 | `r` · `a` · `f` | Reply · reply to all · forward, in an open conversation. |
+| `Shift`+`f` | Forward to an agent, in an open conversation. |
 | `c` · `/` | Write a new message · search. |
 | `g` then `i` `s` `t` `d` `a` | Go to the Inbox, Starred, Sent, Drafts, Archive. |
 | `z` | Undo the last action, while its notice is still showing. |
@@ -1526,6 +1527,24 @@ order they came in, and Escape leaves everything as it was. While you are arrang
 button moves it rather than doing what it does. The order is yours, in every compose window and on
 every device you sign in from, and buttons that do not fit still fold into **⋮** from the right
 end of your order.
+
+## Forward to an agent
+
+An agent is anything that reads email and acts on it: a bot, an assistant, a relay. **Forward to
+agent**, beside **Forward** under an open email and in a message's **⋮** menu, sends that email to
+one of yours with a note from you, in one move. `Shift`+`f` opens it from the keyboard.
+
+The dialog has the note focused and your first agent picked. Write what you want, such as "what do
+you think of this?", and press Ctrl+Enter (⌘+Enter on a Mac), or **Send to …**. `Alt`+`1` to `9`
+picks another agent without leaving the note. The forward goes from the account the email is in,
+with your note above the forwarded message and its attachments carried along, exactly as **Forward**
+would send it. It waits ten seconds first, like any send, and **Undo** on the notice opens it in a
+compose window instead.
+
+Your agents are listed under **Settings → Compose → Forward to agent**: a name and an address each,
+up to nine, in the order the dialog shows them. The dialog only sends to an address on that list.
+An encrypted email cannot be forwarded this way, because only the compose window can decrypt its
+quote; use **Forward**.
 
 ## Read receipts
 
