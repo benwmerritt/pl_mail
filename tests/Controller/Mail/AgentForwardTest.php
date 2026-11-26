@@ -6,6 +6,7 @@ namespace App\Tests\Controller\Mail;
 
 use App\Domain\Enum\Crypto\ContactKeyOrigin;
 use App\Domain\Enum\Crypto\ContactKeyStatus;
+use App\Domain\Enum\Crypto\RecipientPolicy;
 use App\Entity\Crypto\ContactKey;
 use App\Entity\Mail\Account;
 use App\Entity\Mail\Message;
@@ -87,6 +88,19 @@ final class AgentForwardTest extends WebTestCase
         self::assertStringStartsWith("What do you think of this?\nBe brief.", $text);
         self::assertStringContainsString('Subject: Your order has shipped', $text, 'the text part lost the forwarded headers');
         self::assertStringContainsString('Your parcel is on its way.', $text, 'an agent reading the text part would not see the mail');
+    }
+
+    public function testTheTextPartKeepsWhereLinksGo(): void
+    {
+        $client  = $this->signIn();
+        $message = $this->message();
+
+        $message->bodyHtml = '<p>Your invoice: <a href="https://shop.example.test/invoice?id=1&amp;v=2">View invoice</a></p>';
+        $this->em->flush();
+
+        $this->forward($client, $message, self::AGENT, '');
+
+        self::assertStringContainsString('View invoice <https://shop.example.test/invoice?id=1&v=2>', (string) $this->queuedDraft()->bodyText);
     }
 
     public function testTheNoteIsTextNotMarkup(): void
@@ -198,6 +212,32 @@ final class AgentForwardTest extends WebTestCase
         $crawler = $client->request('GET', "/mail/forward-to-agent/{$message->id}");
 
         self::assertCount(0, $crawler->filter('[data-controller="mail--agent-forward"]'), 'the dialog offered a send the composer would have encrypted to the Bcc');
+
+        $client->request(
+            'POST',
+            "/mail/forward-to-agent/{$message->id}",
+            server: ['CONTENT_TYPE' => 'application/json', 'HTTP_X-CSRF-Token' => $token],
+            content: (string) json_encode(['agent' => self::AGENT, 'note' => '']),
+        );
+
+        self::assertSame(422, $client->getResponse()->getStatusCode());
+        self::assertSame([], $this->queued());
+    }
+
+    public function testAnAgentWithAKeyCannotBePickedEvenWhenNeverEncrypted(): void
+    {
+        $client  = $this->signIn();
+        $message = $this->message();
+        $token   = $this->token($client, $message);
+
+        $key          = new ContactKey($this->user, self::AGENT, str_repeat('d', 40), "-----BEGIN PGP PUBLIC KEY BLOCK-----\n\nx\n-----END PGP PUBLIC KEY BLOCK-----", ContactKeyOrigin::Manual, ContactKeyStatus::Current, null, new DateTimeImmutable());
+        $key->encrypt = RecipientPolicy::Never;
+        $this->em->persist($key);
+        $this->em->flush();
+
+        $crawler = $client->request('GET', "/mail/forward-to-agent/{$message->id}");
+
+        self::assertNotNull($crawler->filter('input[name="agent"]')->first()->attr('disabled'), 'the composer would sign mail to this agent');
 
         $client->request(
             'POST',

@@ -158,11 +158,12 @@ final readonly class AgentForwarder
         }
 
         foreach ($this->recipientKeys->describe($user, $addresses, false) as $recipient) {
-            if (RecipientPolicy::Always->value === $recipient['encrypt'] || RecipientPolicy::Always->value === $recipient['sign']) {
-                return true;
-            }
-
-            if (RecipientPolicy::Never->value !== $recipient['encrypt'] && (null !== $recipient['key'] || null !== $recipient['smime'])) {
+            // A key alone is enough: whatever the address's encrypt policy,
+            // the composer signs mail to anyone it holds a key for.
+            if (RecipientPolicy::Always->value === $recipient['encrypt']
+                || RecipientPolicy::Always->value === $recipient['sign']
+                || null !== $recipient['key']
+                || null !== $recipient['smime']) {
                 return true;
             }
         }
@@ -232,11 +233,26 @@ final readonly class AgentForwarder
      *
      * DraftPersister::plainTextBody() keeps just the sender's own writing and
      * drops everything from the quote down, which suits a person reading the
-     * HTML. An agent may read the text part alone, and the mail is the point.
+     * HTML. An agent may read the text part alone, and the mail is the point,
+     * so a link keeps where it goes: "View invoice <https://…>".
      */
     private static function wholeText(string $html): ?string
     {
         $html = (string) preg_replace('#<(style|script|head)\b.*?</\1\s*>#is', '', $html);
+        $html = (string) preg_replace_callback(
+            '#<a\b[^>]*?\bhref\s*=\s*(?:"([^"]*)"|\'([^\']*)\')[^>]*>(.*?)</a\s*>#is',
+            static function (array $link): string {
+                $href  = trim(html_entity_decode($link[1] . $link[2], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                $label = trim(html_entity_decode(strip_tags($link[3]), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+
+                if (1 !== preg_match('#^(https?:|mailto:)#i', $href) || $label === $href || 'mailto:' . $label === $href) {
+                    return $link[3];
+                }
+
+                return $link[3] . ' &lt;' . htmlspecialchars($href, ENT_QUOTES, 'UTF-8') . '&gt;';
+            },
+            $html,
+        );
         $html = (string) preg_replace('/\s+/', ' ', $html);
         $html = (string) preg_replace('#<div[^>]*data-quoted#i', "\n$0", $html);
         $html = (string) preg_replace('#<br\s*/?>|</(p|div|li|tr|h[1-6]|blockquote)\s*>#i', "$0\n", $html);
