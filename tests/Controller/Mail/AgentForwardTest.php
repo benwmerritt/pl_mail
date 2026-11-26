@@ -105,6 +105,19 @@ final class AgentForwardTest extends WebTestCase
         self::assertStringContainsString('View invoice <https://shop.example.test/invoice?id=1&v=2>', (string) $this->queuedDraft()->bodyText);
     }
 
+    public function testTheTextPartKeepsPreformattedSpacing(): void
+    {
+        $client  = $this->signIn();
+        $message = $this->message();
+
+        $message->bodyHtml = "<p>The log:</p><pre>  line one\n    indented  twice\n\n\n\nafter gap</pre>";
+        $this->em->flush();
+
+        $this->forward($client, $message, self::AGENT, '');
+
+        self::assertStringContainsString("  line one\n    indented  twice\n\n\n\nafter gap", (string) $this->queuedDraft()->bodyText);
+    }
+
     public function testTheNoteIsTextNotMarkup(): void
     {
         $client = $this->signIn();

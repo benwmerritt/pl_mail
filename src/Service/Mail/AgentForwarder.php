@@ -260,12 +260,33 @@ final readonly class AgentForwarder
             },
             $html,
         );
+
+        // A <pre> keeps its spacing: set aside before whitespace is collapsed
+        // and put back as it was. The marker is a private-use character, which
+        // strip_tags() and html_entity_decode() pass through.
+        $preformatted = [];
+        $html         = (string) preg_replace_callback(
+            '#<pre\b[^>]*>(.*?)</pre\s*>#is',
+            static function (array $block) use (&$preformatted): string {
+                $marker                = "\u{E000}" . count($preformatted) . "\u{E000}";
+                $preformatted[$marker] = html_entity_decode(
+                    strip_tags((string) preg_replace('#<br\s*/?>#i', "\n", $block[1])),
+                    ENT_QUOTES | ENT_HTML5,
+                    'UTF-8',
+                );
+
+                return '<br>' . $marker . '<br>';
+            },
+            $html,
+        );
+
         $html = (string) preg_replace('/\s+/', ' ', $html);
         $html = (string) preg_replace('#<div[^>]*data-quoted#i', "\n$0", $html);
         $html = (string) preg_replace('#<br\s*/?>|</(p|div|li|tr|h[1-6]|blockquote)\s*>#i', "$0\n", $html);
         $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $text = (string) preg_replace('/^[ \t]+|[ \t]+$/m', '', $text);
-        $text = trim((string) preg_replace('/\n{3,}/', "\n\n", $text));
+        $text = (string) preg_replace('/\n{3,}/', "\n\n", $text);
+        $text = trim(strtr($text, $preformatted));
 
         return '' === $text ? null : $text;
     }
