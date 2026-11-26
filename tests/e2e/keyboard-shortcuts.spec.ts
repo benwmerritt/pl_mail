@@ -423,7 +423,29 @@ test.describe("keyboard shortcuts", () => {
         await expect(page.locator(CURSOR)).toHaveAttribute("data-mail--message-row-id-value", ids[1]!);
     });
 
+    test("Shift+K selects upwards from an unticked row, and Caps Lock j is only j", async ({ page }) => {
+        await inbox(page);
+
+        const ids = await page.locator(ROWS).evaluateAll((rows) =>
+            rows.map((row) => row.getAttribute("data-mail--message-row-id-value")));
+        const ticked = () => page.locator(`${ROWS}:has([data-thread-select]:checked)`).evaluateAll((rows) =>
+            rows.map((row) => row.getAttribute("data-mail--message-row-id-value")));
+
+        // Caps Lock: the key is "J", with no Shift held.
+        await page.keyboard.press("j");
+        await page.keyboard.press("J");
+        await page.keyboard.press("j");
+        await expect(page.locator(CURSOR)).toHaveAttribute("data-mail--message-row-id-value", ids[2]!);
+        await expect(page.locator(COUNT)).toHaveText("");
+
+        await page.keyboard.press("Shift+K");
+        await expect(page.locator(CURSOR)).toHaveAttribute("data-mail--message-row-id-value", ids[1]!);
+        expect((await ticked()).sort()).toEqual([ids[1]!, ids[2]!].sort());
+    });
+
     test("Escape goes back to the list, after closing an open menu first", async ({ page }) => {
+        // Labels, so the menu has its filter for `l` to focus and Escape to close.
+        seed("seed-label");
         await inbox(page);
 
         const reading = page.locator('[data-mail--mail-pane-target="reading"]');
@@ -446,7 +468,7 @@ test.describe("keyboard shortcuts", () => {
         await expect(page).toHaveURL(/\/mail\/inbox/);
     });
 
-    test("Tab and Shift+Tab switch inbox tabs while nothing has the focus", async ({ page }) => {
+    test("Tab and Shift+Tab switch inbox tabs once the cursor is in the list", async ({ page }) => {
         // The fixture is all Primary, and the strip only shows when more than
         // one category holds mail; category-tabs-history.spec.ts does the same.
         await page.goto("/mail/inbox");
@@ -469,6 +491,13 @@ test.describe("keyboard shortcuts", () => {
         // Primary, where the inbox opens, is the first of them.
         await expect(current).toHaveAttribute("href", hrefs[0]!);
 
+        // On a page just loaded, Tab walks the page as it always has.
+        await page.keyboard.press("Tab");
+        await expect(page.locator("body")).not.toBeFocused();
+        await expect(current).toHaveAttribute("href", hrefs[0]!);
+
+        await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+        await page.keyboard.press("j");
         await page.keyboard.press("Tab");
         await expect(current).toHaveAttribute("href", hrefs[1]!);
 

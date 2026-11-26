@@ -1,4 +1,4 @@
-<!-- translated-from: features/mail.md sha1:995c1188213e8faa3d170266f3b159e65c7e75ce -->
+<!-- translated-from: features/mail.md sha1:8ebf211818438112dd7565a478852872025c9c90 -->
 
 # Mail
 
@@ -1008,10 +1008,10 @@ nennt sie auch in seinem Tooltip, etwa **Archivieren (e)**. Diese lohnt es sich 
 |---|---|
 | `j` / `k` | In einer Liste nach unten und nach oben. Ist eine Unterhaltung geöffnet: die nächste oder vorherige öffnen. |
 | `↓` / `↑` | Ebenfalls in einer Liste nach unten und nach oben, aber nur, solange die Liste die Tastatur hat: Eine Zeile ist per Klick oder `Tab` hervorgehoben, oder sonst ist nichts geöffnet. In einer geöffneten Unterhaltung scrollen sie diese, wie überall sonst auch. |
-| `o` oder `Enter` | Die hervorgehobene Unterhaltung öffnen. `u` oder `Esc` führt zurück zur Liste; `Esc` schließt zuerst ein offenes Menü. |
+| `o` oder `Enter` | Die hervorgehobene Unterhaltung öffnen. `u` oder `Esc` führt zurück zur Liste, `Esc` nur, solange kein Menü offen ist. |
 | `x` | Die hervorgehobene Unterhaltung auswählen. `*` dann `a` wählt die Seite aus, `*` dann `n` hebt die Auswahl auf. |
 | `Shift`+`j` / `Shift`+`k` | Die hervorgehobene Unterhaltung und die darunter oder darüber auswählen und die Hervorhebung dorthin bewegen, um eine Reihe auszuwählen. |
-| `Tab` / `Shift`+`Tab` | Nächster oder vorheriger Posteingang-Tab, solange nichts auf der Seite den Fokus hat. Hat etwas den Fokus, bewegt `Tab` ihn wie gewohnt. |
+| `Tab` / `Shift`+`Tab` | Nächster oder vorheriger Posteingang-Tab, sobald `j` oder `k` den Cursor in die Liste gesetzt hat. Davor, bei geöffneter Unterhaltung oder solange eine Zeile, ein Knopf oder ein Link den Fokus hat, bewegt `Tab` den Fokus wie gewohnt. |
 | `e` · `#` · `!` | Archivieren · löschen · als Spam markieren. |
 | `s` · `Shift`+`i` · `Shift`+`u` | Markieren · als gelesen markieren · als ungelesen markieren. |
 | `p` | Anheften oder lösen. |
