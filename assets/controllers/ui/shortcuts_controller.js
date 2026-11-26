@@ -145,22 +145,32 @@ const PRESSES = {
 const READS = { u: "back", r: "reply", f: "forward", F: "forwardAgent" };
 
 /**
- * Every button a key presses, and the key: what the tooltips name (FLT-156).
- * Read from the tables the keys themselves are, so a tooltip cannot name a
- * key that presses something else. `a` is the one key outside them — it falls
- * back to Reply — and only Reply all says it, Reply having `r`.
+ * Every button a key presses, where it looks for it, and the key: what the
+ * tooltips name (FLT-156). Read from the tables the keys themselves are, so a
+ * tooltip cannot name a key that presses something else, and searched where
+ * the key searches — the first match in the list toolbar, in the open
+ * conversation or on the page, and each row's own — so a look-alike the key
+ * never reaches (a message's own menu row for Archive) is not named either.
+ * `a` is the one key outside the tables — it falls back to Reply — and only
+ * Reply all says it, Reply having `r`.
  */
 const HINTS = [
-    ...Object.entries(ACTS).flatMap(([key, name]) =>
-        [BULK[name], OPEN[name], ON_ROW[name]].filter(Boolean).map((selector) => [selector, key])),
-    ...Object.entries(PRESSES).map(([key, selector]) => [selector, key]),
-    ...Object.entries(READS).map(([key, name]) => [OPEN[name], key]),
-    [OPEN.replyAll, "a"],
+    ...Object.entries(ACTS).flatMap(([key, name]) => [
+        ["toolbar", BULK[name], key],
+        ["reading", OPEN[name], key],
+        ["rows", ON_ROW[name], key],
+    ]).filter(([, selector]) => undefined !== selector),
+    ...Object.entries(PRESSES).map(([key, selector]) => ["page", selector, key]),
+    ...Object.entries(READS).map(([key, name]) => ["reading", OPEN[name], key]),
+    ["reading", OPEN.replyAll, "a"],
 ];
 
-/** A key as the help lists it: `e`, and Shift for a capital — `Shift+i`. */
+/**
+ * A key as a tooltip names it: `e`, and Shift for a capital — `Shift+F`, the
+ * way the Forward to an agent title already spells its own.
+ */
 function keyName(key) {
-    return /^[A-Z]$/.test(key) ? `Shift+${key.toLowerCase()}` : key;
+    return /^[A-Z]$/.test(key) ? `Shift+${key}` : key;
 }
 
 /**
@@ -633,18 +643,32 @@ export default class extends Controller {
      * is how the keys are learnt without opening the list behind `?`. Only
      * while the shortcuts are on, as this controller is only mounted then.
      * Painted with the cursor because the buttons come and go with the same
-     * rows, toolbars and panes. A button without a title of its own gets one
-     * from its accessible name.
+     * rows, toolbars and panes.
+     *
+     * Only a tooltip the button already has. Its text is wherever ui--tooltip
+     * keeps it: `title` until the button is first hovered, `data-tooltip`
+     * after, when `title` is gone for good so the browser's own tooltip stays
+     * away — and must not be written back.
      */
     #hintKeys() {
-        for (const [selector, key] of HINTS) {
+        const within = {
+            page: document,
+            toolbar: document.querySelector(TOOLBAR),
+            reading: this.#reading(),
+        };
+
+        for (const [where, selector, key] of HINTS) {
+            const buttons = "rows" === where
+                ? this.#rows().map((row) => row.querySelector(selector))
+                : [within[where]?.querySelector(selector)];
             const hint = ` (${keyName(key)})`;
 
-            for (const button of document.querySelectorAll(selector)) {
-                const title = button.getAttribute("title") ?? button.getAttribute("aria-label") ?? button.textContent.replace(/\s+/g, " ").trim();
+            for (const button of buttons) {
+                const attribute = true === button?.hasAttribute("title") ? "title" : "data-tooltip";
+                const text = button?.getAttribute(attribute) ?? "";
 
-                if ("" !== title && false === title.endsWith(hint)) {
-                    button.setAttribute("title", title + hint);
+                if ("" !== text && false === text.endsWith(hint)) {
+                    button.setAttribute(attribute, text + hint);
                 }
             }
         }
