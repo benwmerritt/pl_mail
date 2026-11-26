@@ -1506,6 +1506,24 @@ admin:
     version:
         hint: Der Build, den diese Installation ausführt — die Version und der Commit, aus dem sie gebaut wurde.
         copy: Build %version% kopieren
+agent_forward:
+    add_agent: "Agent hinzufügen"
+    agent_label: "Senden an"
+    agent_sealed: "Mail an diesen Agenten würde verschlüsselt oder signiert. Nutze Weiterleiten."
+    button: "An Agent weiterleiten"
+    button_title: "Diese E-Mail mit einer Notiz an einen deiner Agenten weiterleiten (Shift+F)"
+    cancel: "Abbrechen"
+    empty: "Du hast noch keine Agenten. Füge unter Einstellungen → Verfassen einen hinzu: einen Namen und die Adresse, die er liest."
+    encrypted: "Diese E-Mail ist verschlüsselt und kann nicht an einen Agenten weitergeleitet werden. Nutze Weiterleiten, um sie selbst zu senden."
+    heading: "An Agent weiterleiten"
+    incomplete: "Nicht gesendet: Ein Anhang ließ sich nicht kopieren. Die Weiterleitung liegt in deinen Entwürfen."
+    note_label: "Deine Notiz"
+    note_placeholder: "Was hältst du davon?"
+    pick_hint: "Alt+%n% wählt diesen Agenten"
+    sealed: "Deine Einstellungen würden diese Weiterleitung signieren oder verschlüsseln, und das kann nur das Verfassen-Fenster. Nutze Weiterleiten, um sie selbst zu senden."
+    send_hint: "Strg/⌘+Enter sendet"
+    sending: "Wird an %name% weitergeleitet"
+    submit: "An %name% senden"
 # The All Mail lists — every conversation outside Spam and the bin
 # (LabelRole::AllMail). Their heading is sidebar.nav.all_mail.
 all_mail:
@@ -1991,6 +2009,19 @@ calendar:
         none: Wiederholt sich nicht
         weekly: Wöchentlich
         yearly: Jährlich
+    sets:
+        button: 'Kalender'
+        calendars: 'Kalender'
+        count: '%count% von %total%'
+        custom: 'Eigene Auswahl'
+        default_always: 'Immer sichtbar'
+        heading: 'Sets'
+        local: 'plMail'
+        manage: 'Sets umbenennen oder löschen'
+        name_placeholder: 'Neues Set benennen'
+        save: 'Speichern'
+        title: 'Kalender-Sets: %count% von %total% Kalendern sichtbar'
+        update: '„%name%“ aktualisieren'
     share:
         action:
             delete: 'Link "%name%" löschen'
@@ -2108,6 +2139,7 @@ calendar:
         later: Heute noch
         soon: In wenigen Stunden
     view:
+        3days: '3 Tage'
         agenda: Agenda
         day: Tag
         monday_week: Woche
@@ -3140,6 +3172,8 @@ label:
     menu:
         create: Neu erstellen
         empty: Noch keine Labels.
+        filter: "Zum Filtern tippen"
+        no_match: "Nichts passt."
     updated: Label aktualisiert.
     visibility:
         hidden: Label ist jetzt ausgeblendet.
@@ -3916,6 +3950,15 @@ settings:
         refresh: 'Vom Anbieter aktualisieren'
         subheading: 'Adressen, unter denen dieses Konto sendet und empfängt.'
         system: 'System'
+    calendar_sets:
+        count: '{1}1 Kalender|]1,Inf[ %count% Kalender'
+        delete: '„%name%“ löschen'
+        delete_confirm: 'Das Set „%name%“ löschen? Seine Kalender bleiben, wie sie sind.'
+        empty: 'Noch keine Sets. Kalender im Menü unter dem Kalender anhaken und als Set speichern.'
+        heading: 'Kalender-Sets'
+        rename: '„%name%“ umbenennen'
+        save_name: 'Namen speichern'
+        subheading: 'Gruppen von Kalendern, zwischen denen du in der Leiste unter dem Kalender wechselst.'
     clock:
         heading: Uhrzeitformat
         subheading: Ob Zeiten im 12- oder 24-Stunden-Format geschrieben werden und wo die aktuelle Uhrzeit steht. Gespeichert wird nichts anders — es ändern sich nur die Ziffern.
@@ -3946,6 +3989,18 @@ settings:
         with_keys: "Deine Schlüssel kommen mit: Verschlüsselte Mails öffnen sich in der App sofort."
         expires: "Läuft um %time% ab."
         open_in_app: "In der App öffnen"
+    forward_agents:
+        add: "Agent hinzufügen"
+        address: "Adresse"
+        address_placeholder: "agent@example.com"
+        empty: "Noch keine Agenten. Füge unten einen hinzu, dann erscheint er bei jeder E-Mail unter An Agent weiterleiten."
+        heading: "An Agent weiterleiten"
+        name: "Name"
+        name_placeholder: "Recherche-Bot"
+        refused: "Der Agent wurde nicht hinzugefügt. Prüfe die Adresse; die Liste fasst höchstens %max%."
+        remove: "Entfernen"
+        remove_confirm: "%name% aus deinen Agenten entfernen?"
+        subheading: "Alles, was E-Mails liest. An Agent weiterleiten (Shift+F) schickt eine geöffnete E-Mail mit deiner Notiz an einen davon."
     libravatar:
         heading: 'Libravatar'
         no_picture: 'Du hast noch kein Profilbild; füge oben eins hinzu, damit hier etwas erscheint.'
@@ -4124,6 +4179,7 @@ settings:
             subheading: Wie viel vom Hintergrund durch deine Flächen scheint.
         heading: Darstellung
         import: Theme importieren
+        import_hint: 'Oder ein VS-Code-Farbschema (.json), das alles einfärbt: Bereiche, Text, Schaltflächen und die geöffnete E-Mail.'
         layout:
             boxed: Kacheln
             flat: Flach
@@ -4214,6 +4270,7 @@ settings:
             dark: Dunkel
             dusk: Dämmerung
             heading: Theme
+            imported: 'Aus VS Code importiert: %name%. Wähle ein beliebiges Theme, um zurückzukehren.'
             more: 'Mehr Themes'
             light: Hell
             nord: Nord
@@ -5253,6 +5310,7 @@ settings:
             disposal: "löschen papierkorb endgültig leeren"
             encryption: "pgp openpgp gpg schlüssel"
             filters: "regeln sieve automatisch verschieben weiterleiten"
+            forward_agents: "agent bot assistent ki weiterleiten relay übergeben"
             handwriting: "unterschreiben pdf zeichnen"
             images: "tracking pixel extern laden blockieren"
             inbox_tabs: "tabs werbung sozial benachrichtigungen foren"
@@ -5273,6 +5331,7 @@ settings:
             reading_pane: "vorschau geteilt rechts unten"
             sender_pictures: 'avatar bild foto gravatar libravatar bimi logo symbol absender'
             sharing: "link öffentlich buchung"
+            auto_advance: "automatisch weiter nächste nach archivieren nächste unterhaltung öffnen"
             shortcuts: "tastatur tasten kürzel hotkeys"
             sidebar: 'breite breit schmal größe ziehen lange namen abgeschnitten darüberfahren mehr ordner'
             swipe_actions: "wischen geste handy archivieren"
@@ -5444,6 +5503,14 @@ settings:
         subheading: >-
             Links, die jemandem ohne Konto einen Teil deines Kalenders zeigen,
             und Seiten, auf denen er eine Stunde davon buchen kann.
+    auto_advance:
+        heading: "Automatisch weiter"
+        hint: "Wenn du die offene Unterhaltung archivierst, löschst, verschiebst, zurückstellst oder meldest."
+        label: "Danach zeigen"
+        list: "Die Liste"
+        next: "Die darunter"
+        previous: "Die darüber"
+        subheading: "Was sich öffnet, nachdem die Unterhaltung, die du liest, die Liste verlassen hat."
     shortcuts:
         heading: "Tastenkürzel"
         hint: "c zum Schreiben, e zum Archivieren, j und k, um durch eine Liste zu gehen. Sie wirken nur, solange du nicht gerade irgendwo tippst, und was du so ablegst, lässt sich wie sonst auch rückgängig machen."
@@ -5653,11 +5720,15 @@ shortcuts:
         compose: "Neue Nachricht schreiben"
         conversation_view: 'Zwischen Konversationen und einzelnen E-Mails wechseln'
         delete: "Löschen"
+        extend_down: "Diese und die darunter auswählen"
+        extend_up: "Diese und die darüber auswählen"
         forward: "Weiterleiten"
+        forward_agent: "An einen Agenten weiterleiten"
         go_archive: "Zum Archiv"
         go_drafts: "Zu den Entwürfen"
         go_inbox: "Zum Posteingang"
         go_sent: "Zu Gesendet"
+        go_snoozed: "Zu Zurückgestellt"
         go_starred: "Zu Markiert"
         help: "Diese Liste anzeigen"
         label: "Label vergeben"
@@ -5666,10 +5737,12 @@ shortcuts:
         move: "Verschieben nach"
         next: "Eine Unterhaltung nach unten"
         next_conversation: "Nächste Unterhaltung öffnen"
+        next_tab: "Nächster Posteingang-Tab, wenn der Cursor in der Liste steht"
         open: "Hervorgehobene Unterhaltung öffnen"
         pin: 'Anheften oder lösen'
         previous: "Eine Unterhaltung nach oben"
         previous_conversation: "Vorherige Unterhaltung öffnen"
+        previous_tab: "Vorheriger Posteingang-Tab, wenn der Cursor in der Liste steht"
         reply: "Antworten"
         reply_all: "Allen antworten"
         search: "Suchen"
@@ -6098,6 +6171,7 @@ contacts:
     import_uploading: 'Wird hochgeladen…'
     imported: '%count% Kontakte importiert.'
     in_address_book: 'In deinen Kontakten'
+    open_in_twenty: 'In Twenty öffnen'
     keep_this: 'Diesen behalten'
     label: Bezeichnung
     label_home: Privat

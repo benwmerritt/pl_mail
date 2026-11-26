@@ -627,6 +627,11 @@ Labels** in **Settings → Labels** to list folders there too, where they wear a
 dot. Folders are made, renamed and deleted in the account's own folder list, never by making or
 renaming a label; see [Folders](accounts.md#folders).
 
+**Label as** and **Move to** open with a field to type into: a few letters narrow the list to what
+matches, `↓` and `↑` move through what is left, `Enter` picks the highlighted one and `Escape` closes
+the menu. With `l` or `v` on an open conversation that makes the keyboard enough. When nothing
+matches, **Create new** in **Label as** is what is left, and it opens with what you typed as the new label's name.
+
 ### Labels by account
 
 A label with the same name on several accounts is one label in plMail: "Sports" on two Gmail
@@ -911,14 +916,17 @@ touch, the row's own buttons and the toolbar do the same work.
 ### Keyboard shortcuts
 
 The single keys Gmail uses work here too. Press **?** anywhere for the full list, or the
-keyboard button above a mail list; the ones worth knowing first:
+keyboard button above a mail list. A button a key presses also names it in its tooltip, as
+**Archive (e)**. The ones worth knowing first:
 
 | Key | Does |
 |---|---|
 | `j` / `k` | Move down and up a list. With a conversation open, open the next or previous one. |
 | `↓` / `↑` | Move down and up a list too, but only while the list has the keyboard: a row is highlighted by a click or by `Tab`, or nothing else is open. In an open conversation they scroll it, as they would anywhere. |
-| `o` or `Enter` | Open the highlighted conversation. `u` goes back to the list. |
+| `o` or `Enter` | Open the highlighted conversation. `u` or `Esc` goes back to the list, `Esc` only while no menu is open. |
 | `x` | Select the highlighted conversation. `*` then `a` selects the page, `*` then `n` clears. |
+| `Shift`+`j` / `Shift`+`k` | Select the highlighted conversation and the one below or above, and move the highlight there, to select a run. |
+| `Tab` / `Shift`+`Tab` | Next or previous inbox tab, once `j` or `k` has put the cursor in the list. Before that, with a conversation open, or while a row, button or link has the focus, `Tab` moves the focus as usual. |
 | `e` · `#` · `!` | Archive · delete · mark as spam. |
 | `s` · `Shift`+`i` · `Shift`+`u` | Star · mark as read · mark as unread. |
 | `p` | Pin or unpin. |
@@ -926,7 +934,7 @@ keyboard button above a mail list; the ones worth knowing first:
 | `l` · `v` · `b` | Label as · move to · snooze. |
 | `r` · `a` · `f` | Reply · reply to all · forward, in an open conversation. |
 | `c` · `/` | Write a new message · search. |
-| `g` then `i` `s` `t` `d` `a` | Go to the Inbox, Starred, Sent, Drafts, Archive. |
+| `g` then `i` `s` `t` `d` `a` `b` | Go to the Inbox, Starred, Sent, Drafts, Archive, Snoozed. |
 | `z` | Undo the last action, while its notice is still showing. |
 
 **What a key acts on:** whatever is selected; if nothing is, the conversation that is open; if none
@@ -1058,6 +1066,15 @@ you had it.
 **Keys and ticked rows.** Beside the list a selection and an open conversation can be on screen
 together. A key still goes to the selection first: `e` with two rows ticked archives those two and
 leaves the conversation you are reading open.
+
+**After the open conversation leaves the list.** Archiving, deleting, moving, snoozing or reporting
+the conversation you are reading takes you back to the list. **Settings → General → Layout &
+controls → Auto-advance** can open the one below it in the list instead, or the one above, so `e`
+works through a mailbox without going back each time. It works the same with one pane or two, from a
+button or a key. At the end of the list, or for a message opened from somewhere the list does not
+show it, you go back to the list as before. So does archiving one email of a conversation, and
+Mark as unread, because the conversation is still in the list. Back in the browser skips the
+conversation that left.
 
 ## Who a message is from
 

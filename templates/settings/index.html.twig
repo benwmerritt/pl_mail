@@ -288,6 +288,18 @@ the links that leave the app (a provider's consent screen, an .ics download).
                                                     } only %}
                                                 {% endblock %}
                                             {% endembed %}
+
+                                            {% embed 'settings/_card.html.twig' with {
+                                                id:         'card-auto-advance',
+                                                heading:    'settings.auto_advance.heading'|trans,
+                                                subheading: 'settings.auto_advance.subheading'|trans,
+                                            } %}
+                                                {% block body %}
+                                                    {% include 'settings/_auto_advance.html.twig' with {
+                                                        advance: app.user.autoAdvance,
+                                                    } only %}
+                                                {% endblock %}
+                                            {% endembed %}
                                         </div>
                                     {% elseif section == 'reading' %}
                                         {# What happens when a mail is opened: where it opens, and
@@ -364,6 +376,16 @@ the links that leave the app (a provider's consent screen, an .ics download).
                                                             manageableAccounts: manageableAccounts,
                                                         } %}
                                                     </div>
+                                                {% endblock %}
+                                            {% endembed %}
+
+                                            {% embed 'settings/_card.html.twig' with {
+                                                id:         'card-forward-agents',
+                                                heading:    'settings.forward_agents.heading'|trans,
+                                                subheading: 'settings.forward_agents.subheading'|trans,
+                                            } %}
+                                                {% block body %}
+                                                    {% include 'settings/_forward_agents.html.twig' %}
                                                 {% endblock %}
                                             {% endembed %}
                                         </div>
@@ -811,6 +833,16 @@ the links that leave the app (a provider's consent screen, an .ics download).
                                                         calendarConnections: calendarConnections|default([]),
                                                     } only %}
                                                 </div>
+                                            {% endblock %}
+                                        {% endembed %}
+
+                                        {% embed 'settings/_card.html.twig' with {
+                                            id:         'card-calendar-sets',
+                                            heading:    'settings.calendar_sets.heading'|trans,
+                                            subheading: 'settings.calendar_sets.subheading'|trans,
+                                        } %}
+                                            {% block body %}
+                                                {% include 'settings/_calendar_sets.html.twig' only %}
                                             {% endblock %}
                                         {% endembed %}
 

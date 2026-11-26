@@ -1,4 +1,4 @@
-<!-- translated-from: README.md sha1:5511cddb3442cfdf4bab517a0c3e4f7e7dd4f58a -->
+<!-- translated-from: README.md sha1:4335631cc28bded2137a18fc58380ce336e061cd -->
 
 # plMail-Dokumentation
 
@@ -28,11 +28,12 @@ wo der Mechanismus dahinter steht.
 | Seite | Worum es geht |
 |---|---|
 | [Mail](features/mail.md) | Lesen, Konversationen, Labels, Suche und ihre Operatoren, Zurückstellen, Anhänge, Verfassen, Signaturen, Emoji und eingebettete Bilder, später senden, Lesebestätigungen, Entwürfe, Senden rückgängig machen |
+| [An einen Agenten weiterleiten](features/forward-to-agent.md) | Die E-Mail, die du liest, mit einer Notiz an einen Agenten schicken, in einem Zug, und deine Liste von Agenten verwalten (auf Englisch) |
 | [Konten und Aliase](features/accounts.md) | Gmail-, Outlook- und IMAP-Konten hinzufügen, Absendeadressen, Einstellungen pro Konto |
 | [Zustand der Konten](features/health.md) | Was kaputt ist und was es behebt, ein Konto neu verbinden, ohne seine Post zu verlieren, die zwei Arten, wie Push kaputtgeht |
 | [Vorlagen](features/templates.md) | Wiederverwendbare Nachrichten, der Ordnerbaum, der deine Konten spiegelt, Variablen für Empfänger, Absender, Signatur und Datum, Einfügen beim Verfassen |
 | [Filter](features/filters.md) | Bedingungsbäume, Aktionen, die Rückübersetzung in einen Satz, eine Regel auf bereits eingetroffene Mail anwenden |
-| [Kalender](features/calendar.md) | Die vier Ansichten und das Zeitraster, Termine anlegen und bearbeiten, Wiederholungen, eine einzelne Termininstanz bearbeiten, der angedockte Bereich |
+| [Kalender](features/calendar.md) | Die fünf Ansichten und das Zeitraster, Kalender-Sets, Termine anlegen und bearbeiten, Wiederholungen, eine einzelne Termininstanz bearbeiten, der angedockte Bereich |
 | [Einladungen und Termine aus E-Mails](features/calendar-invitations.md) | Zu- und Absagen, Termine aus Einladungen und aus gewöhnlichem Fließtext, Vorschläge, „Demnächst“ |
 | [Erinnerungen](features/calendar-alerts.md) | Erinnerungen setzen, wie sie zugestellt werden, was eine frische Installation braucht, damit sie ankommen |
 | [Verbundene Kalender](features/calendar-sync.md) | Google-, Microsoft- und CalDAV-Kalender abonnieren, Abgleich in beide Richtungen, ICS-Import, -Export und Feed-Abonnements, doppelte Termine |

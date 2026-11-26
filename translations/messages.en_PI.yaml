@@ -1412,6 +1412,24 @@ admin:
     version:
         hint: The build this ship be sailin' — the release, an' the commit she were built from.
         copy: Copy the build %version% to yer clipboard
+agent_forward:
+    add_agent: "Sign on a hand"
+    agent_label: "Send to"
+    agent_sealed: "Letters to this hand would be sealed or signed. Use Pass it on."
+    button: "Pass to a hand"
+    button_title: "Pass this letter to one o' yer hands with a note (Shift+F)"
+    cancel: "Belay that"
+    empty: "Ye've no hands aboard yet. Sign one on under Settings → Scribblin': a name and the address it reads."
+    encrypted: "This letter be under lock, so it can't be passed to a hand. Use Pass it on to send it yerself."
+    heading: "Pass to a hand"
+    incomplete: "Not sent: a bit o' cargo couldn't be copied. The pass-on be in yer Drafts."
+    note_label: "Yer note"
+    note_placeholder: "What d'ye make o' this?"
+    pick_hint: "Alt+%n% picks this hand"
+    sealed: "Yer settings would seal or sign this here pass-on, and only the scribblin' window can do that. Use Pass it on to send it yerself."
+    send_hint: "Ctrl/⌘+Enter casts off"
+    sending: "Passin' to %name%"
+    submit: "Send to %name%"
 # The All Mail lists — every conversation outside Spam and the bin
 # (LabelRole::AllMail). Their heading is sidebar.nav.all_mail.
 all_mail:
@@ -1881,6 +1899,19 @@ calendar:
         none: Comes but once
         weekly: Every week
         yearly: Every year
+    sets:
+        button: 'Charts'
+        calendars: 'Charts'
+        count: '%count% of %total%'
+        custom: 'Yer own pick'
+        default_always: 'Always on deck'
+        heading: 'Fleets'
+        local: 'plMail'
+        manage: 'Rename or scuttle fleets'
+        name_placeholder: 'Name a new fleet'
+        save: 'Stow it'
+        title: 'Chart fleets: %count% of %total% charts showin'''
+        update: 'Update "%name%"'
     share:
         action:
             delete: 'Scuttle the berth "%name%"'
@@ -1995,6 +2026,7 @@ calendar:
         later: Later this day
         soon: In a few hours
     view:
+        3days: 'Three suns'
         agenda: The list
         day: Day
         monday_week: Week
@@ -3018,6 +3050,8 @@ label:
     menu:
         create: Hoist a new one
         empty: No flags yet.
+        filter: "Type to narrow the chart"
+        no_match: "Nothin' matches, matey."
     updated: Flag mended.
     visibility:
         hidden: That flag be lowered.
@@ -3772,6 +3806,15 @@ settings:
         refresh: 'Fetch from the harbourmaster'
         subheading: 'Addresses this crew member sends and receives under.'
         system: 'ship''s own'
+    calendar_sets:
+        count: '{1}1 chart|]1,Inf[ %count% charts'
+        delete: 'Scuttle "%name%"'
+        delete_confirm: 'Scuttle the fleet "%name%"? Its charts stay as they be.'
+        empty: 'No fleets yet. Tick charts in the menu below the calendar, then stow ''em as a fleet.'
+        heading: 'Chart fleets'
+        rename: 'Rename "%name%"'
+        save_name: 'Stow the name'
+        subheading: 'Groups o'' charts ye switch between from the bar below the calendar.'
     clock:
         heading: Th' glass
         subheading: Whether th' hours be writ in twelves or in four-and-twenty, an' where th' hour o' now be hung. Naught be stored different — only th' figures change.
@@ -3802,6 +3845,18 @@ settings:
         with_keys: "Yer keys sail along: ciphered letters open in the app straight away."
         expires: "Fades at %time%."
         open_in_app: "Open it in th' app"
+    forward_agents:
+        add: "Sign on"
+        address: "Address"
+        address_placeholder: "agent@example.com"
+        empty: "No hands aboard yet. Sign one on below and it shows in Pass to a hand on every letter."
+        heading: "Pass to a hand"
+        name: "Name"
+        name_placeholder: "Scoutin' bot"
+        refused: "That hand weren't signed on. Check the address; the crew holds %max% at most."
+        remove: "Put ashore"
+        remove_confirm: "Put %name% ashore?"
+        subheading: "Anythin' that reads letters. Pass to a hand (Shift+F) sends an open letter to one o' these with yer note."
     libravatar:
         heading: 'Libravatar'
         no_picture: 'Ye have no portrait yet; add one above fer this to show anything.'
@@ -3978,6 +4033,7 @@ settings:
             subheading: How much o' the backdrop shows through yer panels.
         heading: Look o' the ship
         import: Import theme
+        import_hint: 'Or a VS Code colour theme (.json), which paints the whole ship: panels, words, buttons an'' the open letter.'
         layout:
             boxed: Crates
             flat: Flat as a calm sea
@@ -4065,6 +4121,7 @@ settings:
             dark: Dark
             dusk: Dusk
             heading: Theme
+            imported: 'Brought aboard from VS Code: %name%. Pick any theme to go back.'
             more: 'More flags'
             light: Light
             nord: Nord
@@ -5037,6 +5094,7 @@ settings:
             disposal: "delete trash bin forever empty"
             encryption: "pgp openpgp gpg key"
             filters: "rules sieve automatic move forward"
+            forward_agents: "agent bot assistant ai forward relay hand off"
             handwriting: "sign pdf draw"
             images: "tracking pixel remote load block"
             inbox_tabs: "tabs promotions social updates forums"
@@ -5057,6 +5115,7 @@ settings:
             reading_pane: "preview split right bottom"
             sender_pictures: 'avatar picture photo gravatar libravatar bimi logo icon sender likeness flag'
             sharing: "link public booking"
+            auto_advance: "auto advance next after archive open next conversation"
             shortcuts: "keyboard hotkeys keys"
             sidebar: 'width wide narrow resize haul long names cut short hover more folders'
             swipe_actions: "swipe gesture phone archive"
@@ -5211,6 +5270,14 @@ settings:
         subheading: >-
             Berths that show part o yer log to someone wi no account, an notices
             that let em board an hour o it.
+    auto_advance:
+        heading: "Auto-advance"
+        hint: "When ye stow, scuttle, move, snooze or report the open conversation."
+        label: "Afterwards, show"
+        list: "The list"
+        next: "The one below"
+        previous: "The one above"
+        subheading: "What opens after the conversation ye be readin' leaves the list."
     shortcuts:
         heading: "Keyboard shortcuts"
         hint: "c to scribble, e to stow, j an' k to walk the list. They only act while ye be not typin' into somethin', an' post stowed this way can be hauled back like any other."
@@ -5420,11 +5487,15 @@ shortcuts:
         compose: "Scribble a new message"
         conversation_view: 'Switch ''twixt whole yarns an'' single letters'
         delete: "Feed to the fishes"
+        extend_down: "Mark this one an' the one below"
+        extend_up: "Mark this one an' the one above"
         forward: "Pass it on"
+        forward_agent: "Pass to a hand"
         go_archive: "Sail to the hold"
         go_drafts: "Sail to Drafts"
         go_inbox: "Sail to the Inbox"
         go_sent: "Sail to Sent"
+        go_snoozed: "Sail to Kept below deck"
         go_starred: "Sail to Marked"
         help: "Show this list"
         label: "Label as"
@@ -5433,10 +5504,12 @@ shortcuts:
         move: "Move to"
         next: "Down one yarn"
         next_conversation: "Open the next yarn"
+        next_tab: "Next inbox tab, with the cursor in the list"
         open: "Open the marked yarn"
         pin: 'Nail to the mast or pry it off'
         previous: "Up one yarn"
         previous_conversation: "Open the yarn afore"
+        previous_tab: "Previous inbox tab, with the cursor in the list"
         reply: "Answer"
         reply_all: "Answer all hands"
         search: "Search"
@@ -5862,6 +5935,7 @@ contacts:
     import_uploading: "Hoistin'…"
     imported: 'Hauled in %count% shipmates.'
     in_address_book: 'In yer crew'
+    open_in_twenty: 'Spy on this one in Twenty'
     keep_this: 'Keep this one'
     label: Label
     label_home: 'Home port'

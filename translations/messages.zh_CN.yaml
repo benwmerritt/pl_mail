@@ -1356,6 +1356,24 @@ admin:
     version:
         hint: 此部署当前运行的构建，包括发布版本及其来源提交。
         copy: "复制构建版本 %version%"
+agent_forward:
+    add_agent: "添加代理"
+    agent_label: "发送给"
+    agent_sealed: "发给此代理的邮件会被加密或签名。请使用“转发”。"
+    button: "转发给代理"
+    button_title: "附上备注，将这封邮件转发给你的某个代理（Shift+F）"
+    cancel: "取消"
+    empty: "你还没有代理。请在 设置 → 撰写 中添加：填写名称和它读取的地址。"
+    encrypted: "这封邮件已加密，无法转发给代理。请使用“转发”自行发送。"
+    heading: "转发给代理"
+    incomplete: "未发送：有附件无法复制。这封转发在你的草稿中。"
+    note_label: "你的备注"
+    note_placeholder: "你怎么看？"
+    pick_hint: "Alt+%n% 选择此代理"
+    sealed: "你的设置会对这封转发签名或加密，而这只能在撰写窗口中完成。请使用“转发”自行发送。"
+    send_hint: "Ctrl/⌘+Enter 发送"
+    sending: "正在转发给 %name%"
+    submit: "发送给 %name%"
 all_mail:
     empty: 除垃圾邮件和废纸篓外，没有邮件。
 alias:
@@ -1756,6 +1774,19 @@ calendar:
         none: 不重复
         weekly: 每周
         yearly: 每年
+    sets:
+        button: '日历'
+        calendars: '日历'
+        count: '%count% / %total%'
+        custom: '自定义'
+        default_always: '始终显示'
+        heading: '日历组'
+        local: 'plMail'
+        manage: '重命名或删除日历组'
+        name_placeholder: '新日历组名称'
+        save: '保存'
+        title: '日历组：显示 %count% / %total% 个日历'
+        update: '更新“%name%”'
     share:
         action:
             delete: 删除链接“%name%”
@@ -1852,6 +1883,7 @@ calendar:
         later: 今天稍后
         soon: 几小时后
     view:
+        3days: '3 天'
         agenda: 日程列表
         day: 日
         monday_week: 周
@@ -2822,6 +2854,8 @@ label:
     menu:
         create: '新建'
         empty: '暂无标签。'
+        filter: '输入以筛选'
+        no_match: '没有匹配项。'
     updated: '标签已更新。'
     visibility:
         hidden: '标签已隐藏。'
@@ -3502,6 +3536,15 @@ settings:
         refresh: '从服务商刷新'
         subheading: '此账户用于收发邮件的地址。'
         system: '系统'
+    calendar_sets:
+        count: '{1}1 个日历|]1,Inf[ %count% 个日历'
+        delete: '删除“%name%”'
+        delete_confirm: '删除日历组“%name%”？其中的日历保持不变。'
+        empty: '还没有日历组。在日历下方的菜单中勾选日历，然后保存为日历组。'
+        heading: '日历组'
+        rename: '重命名“%name%”'
+        save_name: '保存名称'
+        subheading: '在日历下方栏中切换的日历分组。'
     clock:
         heading: '时钟'
         subheading: '选择使用十二小时制或二十四小时制，以及当前时间的显示位置。存储方式不变，只改变显示的数字。'
@@ -3532,6 +3575,18 @@ settings:
         with_keys: "密钥会一同传输，加密邮件可立即在应用中打开。"
         expires: '于 %time% 过期。'
         open_in_app: '在应用中打开'
+    forward_agents:
+        add: "添加代理"
+        address: "地址"
+        address_placeholder: "agent@example.com"
+        empty: "还没有代理。在下方添加后，每封邮件的“转发给代理”中都会出现它。"
+        heading: "转发给代理"
+        name: "名称"
+        name_placeholder: "研究机器人"
+        refused: "未能添加该代理。请检查地址；列表最多 %max% 个。"
+        remove: "移除"
+        remove_confirm: "要从代理中移除 %name% 吗？"
+        subheading: "任何能读取邮件的对象。“转发给代理”（Shift+F）会把打开的邮件连同你的备注发给其中一个。"
     libravatar:
         heading: 'Libravatar'
         no_picture: '你还没有头像；请先在上方添加，此处才会显示内容。'
@@ -3701,6 +3756,7 @@ settings:
             subheading: '面板透出背景的程度。'
         heading: '外观'
         import: '导入主题'
+        import_hint: '也可以导入 VS Code 配色主题（.json），为整个界面上色：面板、文字、按钮和打开的邮件。'
         layout:
             boxed: '卡片式'
             flat: '平面式'
@@ -3788,6 +3844,7 @@ settings:
             dark: '深色'
             dusk: '黄昏'
             heading: '主题'
+            imported: '已从 VS Code 导入：%name%。选择任一主题即可恢复。'
             more: '更多主题'
             light: '浅色'
             nord: 'Nord'
@@ -4548,6 +4605,7 @@ settings:
             disposal: "删除 回收站 彻底 清空"
             encryption: "pgp openpgp gpg 密钥"
             filters: "规则 sieve 自动 移动 转发"
+            forward_agents: "代理 机器人 助手 ai 转发 中继 交给"
             handwriting: "签名 pdf 手写"
             images: "跟踪 像素 远程 加载 阻止"
             inbox_tabs: "标签页 推广 社交 动态 论坛"
@@ -4568,6 +4626,7 @@ settings:
             reading_pane: "预览 分栏 右侧 下方"
             sender_pictures: '头像 图片 照片 gravatar libravatar bimi 标志 图标 发件人'
             sharing: "链接 公开 预约"
+            auto_advance: "自动 前进 下一封 归档后 打开下一个会话"
             shortcuts: "键盘 按键 快捷键"
             sidebar: '宽度 宽 窄 调整 拖动 长名称 截断 悬停 更多 文件夹'
             swipe_actions: "滑动 手势 手机 归档"
@@ -4693,6 +4752,14 @@ settings:
     sharing:
         heading: '共享'
         subheading: '通过链接向没有账户的人展示部分日历，或通过页面让他们预约一小时的时间。'
+    auto_advance:
+        heading: "自动前进"
+        hint: "在归档、删除、移动、延后或举报当前打开的会话时。"
+        label: "之后显示"
+        list: "列表"
+        next: "下方那封"
+        previous: "上方那封"
+        subheading: "正在阅读的会话离开列表后要打开的内容。"
     shortcuts:
         heading: '键盘快捷键'
         hint: '按 c 撰写，e 归档，j 和 k 浏览列表。仅在未输入文字时生效，用快捷键整理邮件同样可以撤销。'
@@ -4898,11 +4965,15 @@ shortcuts:
         compose: '撰写新邮件'
         conversation_view: '在会话和单封邮件之间切换'
         delete: '删除'
+        extend_down: '选中当前项及下一项'
+        extend_up: '选中当前项及上一项'
         forward: '转发'
+        forward_agent: "转发给代理"
         go_archive: '前往归档'
         go_drafts: '前往草稿'
         go_inbox: '前往收件箱'
         go_sent: '前往已发送'
+        go_snoozed: '前往已设稍后提醒'
         go_starred: '前往星标邮件'
         help: '显示此列表'
         label: '添加标签'
@@ -4911,10 +4982,12 @@ shortcuts:
         move: '移至'
         next: '向下移动一个会话'
         next_conversation: '打开下一个会话'
+        next_tab: '下一个收件箱标签页（光标在列表中时）'
         open: '打开高亮的会话'
         pin: '置顶或取消置顶'
         previous: '向上移动一个会话'
         previous_conversation: '打开上一个会话'
+        previous_tab: '上一个收件箱标签页（光标在列表中时）'
         reply: '回复'
         reply_all: '回复所有人'
         search: '搜索'
@@ -5319,6 +5392,7 @@ contacts:
     import_uploading: "正在上传…"
     imported: "已导入 %count% 位联系人。"
     in_address_book: "已在联系人中"
+    open_in_twenty: "在 Twenty 中打开"
     keep_this: "保留此联系人"
     label: "标签"
     label_home: "家庭"

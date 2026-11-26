@@ -1491,6 +1491,24 @@ admin:
     version:
         hint: The build this installation is running — the release, and the commit it was built from.
         copy: Copy the build %version%
+agent_forward:
+    add_agent: "Add an agent"
+    agent_label: "Send to"
+    agent_sealed: "Mail to this agent would be encrypted or signed. Use Forward."
+    button: "Forward to agent"
+    button_title: "Forward this email to one of your agents with a note (Shift+F)"
+    cancel: "Cancel"
+    empty: "You have no agents yet. Add one under Settings → Compose: a name and the address it reads."
+    encrypted: "This email is encrypted, so it can't be forwarded to an agent. Use Forward to send it yourself."
+    heading: "Forward to agent"
+    incomplete: "Not sent: an attachment couldn't be copied. The forward is in your Drafts."
+    note_label: "Your note"
+    note_placeholder: "What do you think of this?"
+    pick_hint: "Alt+%n% picks this agent"
+    sealed: "Your settings would sign or encrypt this forward, and only the compose window can do that. Use Forward to send it yourself."
+    send_hint: "Ctrl/⌘+Enter sends"
+    sending: "Forwarding to %name%"
+    submit: "Send to %name%"
 # The All Mail lists — every conversation outside Spam and the bin
 # (LabelRole::AllMail). Their heading is sidebar.nav.all_mail.
 all_mail:
@@ -1964,6 +1982,19 @@ calendar:
         none: Does not repeat
         weekly: Every week
         yearly: Every year
+    sets:
+        button: 'Calendars'
+        calendars: 'Calendars'
+        count: '%count% of %total%'
+        custom: 'Custom'
+        default_always: 'Always shown'
+        heading: 'Sets'
+        local: 'plMail'
+        manage: 'Rename or delete sets'
+        name_placeholder: 'Name a new set'
+        save: 'Save'
+        title: 'Calendar sets: %count% of %total% calendars showing'
+        update: 'Update "%name%"'
     share:
         action:
             delete: 'Delete the link "%name%"'
@@ -2079,6 +2110,7 @@ calendar:
         later: Coming up today
         soon: Coming up in a few hours
     view:
+        3days: '3 days'
         agenda: Agenda
         day: Day
         monday_week: Week
@@ -3136,6 +3168,8 @@ label:
     menu:
         create: Create new
         empty: No labels yet.
+        filter: "Type to filter"
+        no_match: "Nothing matches."
     updated: Label updated.
     visibility:
         hidden: Label is now hidden.
@@ -3924,6 +3958,15 @@ settings:
         refresh: 'Refresh from provider'
         subheading: 'Addresses this account sends and receives as.'
         system: 'system'
+    calendar_sets:
+        count: '{1}1 calendar|]1,Inf[ %count% calendars'
+        delete: 'Delete "%name%"'
+        delete_confirm: 'Delete the set "%name%"? Its calendars stay as they are.'
+        empty: 'No sets yet. Tick calendars in the menu under the calendar, then save them as a set.'
+        heading: 'Calendar sets'
+        rename: 'Rename "%name%"'
+        save_name: 'Save the name'
+        subheading: 'Groups of calendars you switch between from the bar under the calendar.'
     clock:
         heading: Clock
         subheading: Whether times are written on a twelve- or twenty-four-hour clock, and where the current time is shown. Nothing is stored differently — only the digits change.
@@ -3954,6 +3997,18 @@ settings:
         with_keys: "Your keys come along: encrypted mail opens in the app straight away."
         expires: "Expires at %time%."
         open_in_app: "Open in the app"
+    forward_agents:
+        add: "Add agent"
+        address: "Address"
+        address_placeholder: "agent@example.com"
+        empty: "No agents yet. Add one below and it appears in Forward to agent on every email."
+        heading: "Forward to agent"
+        name: "Name"
+        name_placeholder: "Research bot"
+        refused: "That agent was not added. Check the address; the list holds at most %max%."
+        remove: "Remove"
+        remove_confirm: "Remove %name% from your agents?"
+        subheading: "Anything that reads email. Forward to agent (Shift+F) sends an open email to one of these with your note."
     libravatar:
         heading: 'Libravatar'
         no_picture: 'You have no profile picture yet; add one above for this to show anything.'
@@ -4130,6 +4185,7 @@ settings:
             subheading: How much of the background shows through your panels.
         heading: Appearance
         import: Import theme
+        import_hint: 'Or a VS Code colour theme (.json), which colours everything: panels, text, buttons and the open email.'
         layout:
             boxed: Boxed
             flat: Flat
@@ -4217,6 +4273,7 @@ settings:
             dark: Dark
             dusk: Dusk
             heading: Theme
+            imported: 'Imported from VS Code: %name%. Pick any theme to go back.'
             more: 'More themes'
             light: Light
             nord: Nord
@@ -5227,6 +5284,7 @@ settings:
             disposal: "delete trash bin forever empty"
             encryption: "pgp openpgp gpg key"
             filters: "rules sieve automatic move forward"
+            forward_agents: "agent bot assistant ai forward relay hand off"
             handwriting: "sign pdf draw"
             images: "tracking pixel remote load block"
             inbox_tabs: "tabs promotions social updates forums"
@@ -5247,6 +5305,7 @@ settings:
             reading_pane: "preview split right bottom"
             sender_pictures: 'avatar picture photo gravatar libravatar bimi logo icon sender'
             sharing: "link public booking"
+            auto_advance: "auto advance next after archive open next conversation"
             shortcuts: "keyboard hotkeys keys"
             sidebar: 'width wide narrow resize drag long names truncated cut off hover peek more folders'
             swipe_actions: "swipe gesture phone archive"
@@ -5412,6 +5471,14 @@ settings:
         subheading: >-
             Links that show part of your calendar to someone without an account,
             and pages that let them book an hour of it.
+    auto_advance:
+        heading: "Auto-advance"
+        hint: "When you archive, delete, move, snooze or report the open conversation."
+        label: "Afterwards, show"
+        list: "The list"
+        next: "The one below"
+        previous: "The one above"
+        subheading: "What opens after the conversation you are reading leaves the list."
     shortcuts:
         heading: "Keyboard shortcuts"
         hint: "c to compose, e to archive, j and k to move through a list. They only act while you are not typing into something, and filing mail this way can be undone like any other."
@@ -5621,11 +5688,15 @@ shortcuts:
         compose: "Write a new message"
         conversation_view: 'Switch between conversations and single emails'
         delete: "Delete"
+        extend_down: "Select it and the one below"
+        extend_up: "Select it and the one above"
         forward: "Forward"
+        forward_agent: "Forward to an agent"
         go_archive: "Go to Archive"
         go_drafts: "Go to Drafts"
         go_inbox: "Go to the Inbox"
         go_sent: "Go to Sent"
+        go_snoozed: "Go to Snoozed"
         go_starred: "Go to Starred"
         help: "Show this list"
         label: "Label as"
@@ -5634,10 +5705,12 @@ shortcuts:
         move: "Move to"
         next: "Down one conversation"
         next_conversation: "Open the next conversation"
+        next_tab: "Next inbox tab, with the cursor in the list"
         open: "Open the highlighted conversation"
         pin: 'Pin or unpin'
         previous: "Up one conversation"
         previous_conversation: "Open the previous conversation"
+        previous_tab: "Previous inbox tab, with the cursor in the list"
         reply: "Reply"
         reply_all: "Reply to all"
         search: "Search"
@@ -6091,6 +6164,7 @@ contacts:
     import_uploading: Uploading…
     imported: 'Imported %count% contacts.'
     in_address_book: 'In your contacts'
+    open_in_twenty: 'Open in Twenty'
     keep_this: 'Keep this one'
     label: Label
     label_home: Home

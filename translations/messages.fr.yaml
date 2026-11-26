@@ -1500,6 +1500,24 @@ admin:
     version:
         hint: La version que cette installation exécute — la publication, et le commit à partir duquel elle a été construite.
         copy: Copier la version %version%
+agent_forward:
+    add_agent: "Ajouter un agent"
+    agent_label: "Envoyer à"
+    agent_sealed: "Le courrier à cet agent serait chiffré ou signé. Utilisez Transférer."
+    button: "Transférer à un agent"
+    button_title: "Transférer cet e-mail à l’un de vos agents avec une note (Maj+F)"
+    cancel: "Annuler"
+    empty: "Vous n’avez pas encore d’agent. Ajoutez-en un dans Paramètres → Rédaction : un nom et l’adresse qu’il lit."
+    encrypted: "Cet e-mail est chiffré : il ne peut pas être transféré à un agent. Utilisez Transférer pour l’envoyer vous-même."
+    heading: "Transférer à un agent"
+    incomplete: "Non envoyé : une pièce jointe n’a pas pu être copiée. Le transfert est dans vos brouillons."
+    note_label: "Votre note"
+    note_placeholder: "Qu’en pensez-vous ?"
+    pick_hint: "Alt+%n% choisit cet agent"
+    sealed: "Vos paramètres signeraient ou chiffreraient ce transfert, ce que seule la fenêtre de rédaction sait faire. Utilisez Transférer pour l’envoyer vous-même."
+    send_hint: "Ctrl/⌘+Entrée pour envoyer"
+    sending: "Transfert à %name%"
+    submit: "Envoyer à %name%"
 # The All Mail lists — every conversation outside Spam and the bin
 # (LabelRole::AllMail). Their heading is sidebar.nav.all_mail.
 all_mail:
@@ -1974,6 +1992,19 @@ calendar:
         none: Ne se répète pas
         weekly: Toutes les semaines
         yearly: Tous les ans
+    sets:
+        button: 'Calendriers'
+        calendars: 'Calendriers'
+        count: '%count% sur %total%'
+        custom: 'Personnalisé'
+        default_always: 'Toujours affiché'
+        heading: 'Ensembles'
+        local: 'plMail'
+        manage: 'Renommer ou supprimer des ensembles'
+        name_placeholder: 'Nommer un nouvel ensemble'
+        save: 'Enregistrer'
+        title: 'Ensembles de calendriers : %count% sur %total% affichés'
+        update: 'Mettre à jour « %name% »'
     share:
         action:
             delete: 'Supprimer le lien « %name% »'
@@ -2089,6 +2120,7 @@ calendar:
         later: Plus tard aujourd’hui
         soon: Dans quelques heures
     view:
+        3days: '3 jours'
         agenda: Liste
         day: Jour
         monday_week: Semaine
@@ -3153,6 +3185,8 @@ label:
     menu:
         create: Créer
         empty: Aucun libellé pour l’instant.
+        filter: "Tapez pour filtrer"
+        no_match: "Aucun résultat."
     updated: Libellé mis à jour.
     visibility:
         hidden: Le libellé est maintenant masqué.
@@ -3946,6 +3980,15 @@ settings:
         refresh: 'Actualiser depuis le fournisseur'
         subheading: 'Les adresses sous lesquelles ce compte envoie et reçoit.'
         system: 'système'
+    calendar_sets:
+        count: '{1}1 calendrier|]1,Inf[ %count% calendriers'
+        delete: 'Supprimer « %name% »'
+        delete_confirm: 'Supprimer l’ensemble « %name% » ? Ses calendriers restent tels quels.'
+        empty: 'Aucun ensemble. Cochez des calendriers dans le menu sous le calendrier, puis enregistrez-les comme ensemble.'
+        heading: 'Ensembles de calendriers'
+        rename: 'Renommer « %name% »'
+        save_name: 'Enregistrer le nom'
+        subheading: 'Des groupes de calendriers entre lesquels vous basculez depuis la barre sous le calendrier.'
     categories:
         add: "Ajouter"
         built_in: "Intégré"
@@ -4004,6 +4047,18 @@ settings:
         with_keys: 'Vos clés vous accompagnent : le courrier chiffré s’ouvre tout de suite dans l’application.'
         expires: "Expire à %time%."
         open_in_app: "Ouvrir dans l’application"
+    forward_agents:
+        add: "Ajouter l’agent"
+        address: "Adresse"
+        address_placeholder: "agent@example.com"
+        empty: "Aucun agent pour l’instant. Ajoutez-en un ci-dessous : il apparaîtra dans Transférer à un agent sur chaque e-mail."
+        heading: "Transférer à un agent"
+        name: "Nom"
+        name_placeholder: "Bot de recherche"
+        refused: "Cet agent n’a pas été ajouté. Vérifiez l’adresse ; la liste en contient au plus %max%."
+        remove: "Retirer"
+        remove_confirm: "Retirer %name% de vos agents ?"
+        subheading: "Tout ce qui lit les e-mails. Transférer à un agent (Maj+F) envoie l’e-mail ouvert à l’un d’eux avec votre note."
     libravatar:
         heading: 'Libravatar'
         no_picture: 'Vous n''avez pas encore de photo de profil ; ajoutez-en une ci-dessus pour que ceci affiche quelque chose.'
@@ -4181,6 +4236,7 @@ settings:
             subheading: À quel point l’arrière-plan transparaît à travers vos panneaux.
         heading: Apparence
         import: Importer un thème
+        import_hint: 'Ou un thème de couleurs VS Code (.json), qui colore tout : panneaux, texte, boutons et l’e-mail ouvert.'
         layout:
             boxed: Encadrée
             flat: À plat
@@ -4268,6 +4324,7 @@ settings:
             dark: Sombre
             dusk: Crépuscule
             heading: Thème
+            imported: 'Importé de VS Code : %name%. Choisissez n’importe quel thème pour revenir.'
             more: 'Plus de thèmes'
             light: Clair
             nord: Nord
@@ -5289,6 +5346,7 @@ settings:
             disposal: "supprimer corbeille définitivement vider"
             encryption: "pgp openpgp gpg clé"
             filters: "règles sieve automatique déplacer transférer"
+            forward_agents: "agent bot assistant ia transférer relais confier"
             handwriting: "signer pdf dessiner"
             images: "pistage pixel distant charger bloquer"
             inbox_tabs: "onglets promotions réseaux notifications forums"
@@ -5309,6 +5367,7 @@ settings:
             reading_pane: "aperçu partagé droite bas"
             sender_pictures: 'avatar image photo gravatar libravatar bimi logo icône expéditeur'
             sharing: "lien public réservation"
+            auto_advance: "avance automatique suivante après archiver ouvrir la conversation suivante"
             shortcuts: "clavier touches raccourcis"
             sidebar: 'largeur large étroit redimensionner glisser noms longs coupés survol plus dossiers'
             swipe_actions: "balayer geste téléphone archiver"
@@ -5477,6 +5536,14 @@ settings:
         subheading: >-
             Des liens qui montrent une partie de votre agenda à quelqu’un sans compte,
             et des pages qui lui permettent d’en réserver une heure.
+    auto_advance:
+        heading: "Avance automatique"
+        hint: "Lorsque vous archivez, supprimez, déplacez, mettez en attente ou signalez la conversation ouverte."
+        label: "Ensuite, afficher"
+        list: "La liste"
+        next: "Celle du dessous"
+        previous: "Celle du dessus"
+        subheading: "Ce qui s’ouvre une fois que la conversation que vous lisez quitte la liste."
     shortcuts:
         heading: "Raccourcis clavier"
         hint: "c pour rédiger, e pour archiver, j et k pour parcourir une liste. Ils n’agissent que lorsque vous n’êtes pas en train de taper quelque part, et le courrier classé ainsi peut être annulé comme n’importe quel autre."
@@ -5658,11 +5725,15 @@ shortcuts:
         compose: "Écrire un nouveau message"
         conversation_view: 'Basculer entre conversations et e-mails individuels'
         delete: "Supprimer"
+        extend_down: "Sélectionner celle-ci et celle du dessous"
+        extend_up: "Sélectionner celle-ci et celle du dessus"
         forward: "Transférer"
+        forward_agent: "Transférer à un agent"
         go_archive: "Aller aux Archives"
         go_drafts: "Aller aux Brouillons"
         go_inbox: "Aller à la boîte de réception"
         go_sent: "Aller aux Envoyés"
+        go_snoozed: "Aller à En attente"
         go_starred: "Aller aux Suivis"
         help: "Afficher cette liste"
         label: "Appliquer le libellé"
@@ -5671,10 +5742,12 @@ shortcuts:
         move: "Déplacer vers"
         next: "Descendre d’une conversation"
         next_conversation: "Ouvrir la conversation suivante"
+        next_tab: "Onglet suivant de la boîte de réception, le curseur dans la liste"
         open: "Ouvrir la conversation en surbrillance"
         pin: 'Épingler ou désépingler'
         previous: "Monter d’une conversation"
         previous_conversation: "Ouvrir la conversation précédente"
+        previous_tab: "Onglet précédent de la boîte de réception, le curseur dans la liste"
         reply: "Répondre"
         reply_all: "Répondre à tous"
         search: "Rechercher"
@@ -6127,6 +6200,7 @@ contacts:
     import_uploading: 'Envoi en cours…'
     imported: '%count% contacts importés.'
     in_address_book: 'Dans vos contacts'
+    open_in_twenty: 'Ouvrir dans Twenty'
     keep_this: 'Garder celui-ci'
     label: Étiquette
     label_home: Domicile

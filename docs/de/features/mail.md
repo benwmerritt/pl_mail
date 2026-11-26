@@ -1,4 +1,4 @@
-<!-- translated-from: features/mail.md sha1:cab600db4a3f080be55e3f2c5144fadb3143df40 -->
+<!-- translated-from: features/mail.md sha1:8ebf211818438112dd7565a478852872025c9c90 -->
 
 # Mail
 
@@ -692,6 +692,12 @@ Ordner tragen. Ordner legst du in der eigenen Ordnerliste des Kontos an, benenns
 löschst sie dort, nie dadurch, dass du ein Label anlegst oder umbenennst; siehe
 [Ordner](accounts.md#ordner).
 
+**Label vergeben** und **Verschieben nach** öffnen sich mit einem Feld zum Tippen: Ein paar Buchstaben
+grenzen die Liste auf das ein, was passt, `↓` und `↑` gehen durch das, was übrig bleibt, `Enter` nimmt
+das hervorgehobene und `Escape` schließt das Menü. Mit `l` oder `v` in einer offenen Konversation
+reicht so die Tastatur. Passt nichts, bleibt in **Label vergeben** **Neu erstellen** übrig, und es öffnet sich mit dem, was
+du getippt hast, als Namen des neuen Labels.
+
 ### Labels nach Konto
 
 Ein Label mit demselben Namen auf mehreren Konten ist in plMail ein einziges Label: „Sport“ auf zwei
@@ -995,15 +1001,17 @@ die Leiste dieselbe Arbeit.
 ### Tastenkürzel
 
 Die einzelnen Tasten, die Gmail benutzt, funktionieren auch hier. Mit **?** bekommst du überall die
-ganze Liste, ebenso über den Tastatur-Knopf über einer Mail-Liste; diese lohnt es sich zuerst zu
-kennen:
+ganze Liste, ebenso über den Tastatur-Knopf über einer Mail-Liste. Ein Knopf, den eine Taste drückt,
+nennt sie auch in seinem Tooltip, etwa **Archivieren (e)**. Diese lohnt es sich zuerst zu kennen:
 
 | Taste | Wirkung |
 |---|---|
 | `j` / `k` | In einer Liste nach unten und nach oben. Ist eine Unterhaltung geöffnet: die nächste oder vorherige öffnen. |
 | `↓` / `↑` | Ebenfalls in einer Liste nach unten und nach oben, aber nur, solange die Liste die Tastatur hat: Eine Zeile ist per Klick oder `Tab` hervorgehoben, oder sonst ist nichts geöffnet. In einer geöffneten Unterhaltung scrollen sie diese, wie überall sonst auch. |
-| `o` oder `Enter` | Die hervorgehobene Unterhaltung öffnen. `u` führt zurück zur Liste. |
+| `o` oder `Enter` | Die hervorgehobene Unterhaltung öffnen. `u` oder `Esc` führt zurück zur Liste, `Esc` nur, solange kein Menü offen ist. |
 | `x` | Die hervorgehobene Unterhaltung auswählen. `*` dann `a` wählt die Seite aus, `*` dann `n` hebt die Auswahl auf. |
+| `Shift`+`j` / `Shift`+`k` | Die hervorgehobene Unterhaltung und die darunter oder darüber auswählen und die Hervorhebung dorthin bewegen, um eine Reihe auszuwählen. |
+| `Tab` / `Shift`+`Tab` | Nächster oder vorheriger Posteingang-Tab, sobald `j` oder `k` den Cursor in die Liste gesetzt hat. Davor, bei geöffneter Unterhaltung oder solange eine Zeile, ein Knopf oder ein Link den Fokus hat, bewegt `Tab` den Fokus wie gewohnt. |
 | `e` · `#` · `!` | Archivieren · löschen · als Spam markieren. |
 | `s` · `Shift`+`i` · `Shift`+`u` | Markieren · als gelesen markieren · als ungelesen markieren. |
 | `p` | Anheften oder lösen. |
@@ -1011,7 +1019,7 @@ kennen:
 | `l` · `v` · `b` | Label vergeben · verschieben nach · zurückstellen. |
 | `r` · `a` · `f` | Antworten · allen antworten · weiterleiten, in einer geöffneten Unterhaltung. |
 | `c` · `/` | Neue Nachricht schreiben · suchen. |
-| `g` dann `i` `s` `t` `d` `a` | Zum Posteingang, zu Markiert, Gesendet, den Entwürfen, zum Archiv. |
+| `g` dann `i` `s` `t` `d` `a` `b` | Zum Posteingang, zu Markiert, Gesendet, den Entwürfen, zum Archiv, zu Zurückgestellt. |
 | `z` | Die letzte Aktion rückgängig machen, solange ihr Hinweis noch zu sehen ist. |
 
 **Worauf eine Taste wirkt:** auf das, was ausgewählt ist; ist nichts ausgewählt, auf die geöffnete
@@ -1157,6 +1165,16 @@ zurückbringt, wie du es eingerichtet hattest.
 **Tasten und angehakte Zeilen.** Neben der Liste können eine Auswahl und eine geöffnete
 Unterhaltung gleichzeitig zu sehen sein. Eine Taste gilt trotzdem zuerst der Auswahl: `e` mit zwei
 angehakten Zeilen archiviert diese zwei und lässt die Unterhaltung offen, die du gerade liest.
+
+**Wenn die offene Unterhaltung die Liste verlässt.** Archivierst, löschst, verschiebst, stellst du
+die Unterhaltung zurück, die du gerade liest, oder meldest du sie, kommst du zurück zur Liste.
+**Einstellungen → Allgemein → Layout & Bedienung → Automatisch weiter** kann stattdessen die
+Unterhaltung darunter in der Liste öffnen oder die darüber, sodass du mit `e` ein Postfach
+durcharbeitest, ohne jedes Mal zurückzugehen. Das gilt mit einem Bereich wie mit zweien, per Knopf
+wie per Taste. Am Ende der Liste, oder bei einer Nachricht, die die Liste gar nicht zeigt, kommst
+du wie bisher zur Liste zurück. Ebenso, wenn du nur eine E-Mail einer Unterhaltung archivierst, und
+bei Als ungelesen markieren, denn die Unterhaltung steht noch in der Liste. Zurück im Browser
+überspringt die Unterhaltung, die gegangen ist.
 
 ## Von wem eine Mail kommt
 
