@@ -16,7 +16,7 @@ inRelations (ones pointing at it), refEmails (ReferenceEmailFinder rows).
         <a href="{{ path('app_contacts_list') }}" class="{{ iconBtn }}" title="{{ 'contacts.back'|trans }}">
             <i class="fa-solid fa-arrow-left text-sm" aria-hidden="true"></i>
         </a>
-        <h1 class="text-base font-semibold text-ink flex-1 min-w-0 truncate">{{ contact.displayName }}</h1>
+        <h1 class="text-base font-semibold text-ink flex-1 min-w-0 truncate">{{ 'contacts.title'|trans }}</h1>
         {% if contact.editable %}
             <a href="{{ path('app_contacts_edit', { id: contact.id }) }}" class="{{ btnGhost }}">
                 <i class="fa-solid fa-pen text-xs" aria-hidden="true"></i>{{ 'contacts.edit'|trans }}
@@ -42,10 +42,9 @@ inRelations (ones pointing at it), refEmails (ReferenceEmailFinder rows).
                         {% if phonetic %}
                             <p class="text-xs text-ink-faint truncate">{{ phonetic }}</p>
                         {% endif %}
-                        {% if contact.jobTitle or contact.company or contact.department %}
-                            <p class="text-sm text-ink-muted truncate">
-                                {{- [contact.jobTitle, contact.department, contact.company]|filter(v => v)|join(' · ') -}}
-                            </p>
+                        {% set role = [contact.jobTitle, contact.department, contact.company != contact.displayName ? contact.company : null]|filter(v => v) %}
+                        {% if role is not empty %}
+                            <p class="text-sm text-ink-muted">{{ role|join(' · ') }}</p>
                         {% endif %}
                         {% if contact.officeLocation %}
                             <p class="text-xs text-ink-faint truncate">{{ 'contacts.field.officeLocation'|trans }}: {{ contact.officeLocation }}</p>
@@ -218,8 +217,7 @@ inRelations (ones pointing at it), refEmails (ReferenceEmailFinder rows).
 
             {# ── Reference emails ── #}
             <section class="{{ cardCls }}">
-                <h3 class="text-sm font-semibold text-ink mb-1">{{ 'contacts.reference_emails'|trans }}</h3>
-                <p class="text-xs text-ink-faint mb-3">{{ 'contacts.reference_emails_hint'|trans }}</p>
+                <h3 class="text-sm font-semibold text-ink mb-3">{{ 'contacts.reference_emails'|trans }}</h3>
                 {% if refEmails is empty %}
                     <p class="text-sm text-ink-faint">{{ 'contacts.reference_emails_empty'|trans }}</p>
                 {% else %}
@@ -241,7 +239,7 @@ inRelations (ones pointing at it), refEmails (ReferenceEmailFinder rows).
                                         </span>
                                         <span class="block truncate text-xs text-ink-faint">
                                             {{ row.fromName ?: row.fromAddress }}
-                                            {% if row.receivedAt %} · {{ row.receivedAt|date('M j, Y H:i') }}{% endif %}
+                                            {% if row.receivedAt %} · {{ row.receivedAt|intl_date('dMMMy', clock.timezone) }}, {{ row.receivedAt|date(clock.time, clock.timezone) }}{% endif %}
                                         </span>
                                     </span>
                                     {% if row.hasAttachment %}

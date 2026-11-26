@@ -2422,7 +2422,7 @@ compose:
     sending: "Wird gesendet…"
     signature: Signatur einfügen
     signature_none: Für diese Adresse ist keine Signatur hinterlegt
-    subject_label: Betr
+    subject_label: Betreff
     subject_placeholder: Betreff
     text_color: Textfarbe
     to: An

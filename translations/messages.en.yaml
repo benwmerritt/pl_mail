@@ -2416,7 +2416,7 @@ compose:
     sending: "Sending…"
     signature: Insert signature
     signature_none: No signature set for this address
-    subject_label: Subj
+    subject_label: Subject
     subject_placeholder: Subject
     text_color: Text colour
     to: To

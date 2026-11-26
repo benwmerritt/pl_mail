@@ -370,6 +370,18 @@ csrf token. Both measured: see App\Twig\ListFragmentGlobal.
                             <span data-label-for="release">{{ 'pull_to_refresh.release'|trans }}</span>
                         </div>
                         {{ block('list_frame') }}
+
+                        {% if app.user %}
+                            <a href="{{ path('app_compose_new') }}"
+                               data-turbo-frame="compose_dock"
+                               data-compose-fab
+                               class="md:hidden absolute right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-10
+                                      inline-flex items-center gap-2 h-12 px-5 rounded-lg shadow-float
+                                      bg-accent hover:bg-accent-strong text-accent-ink text-sm font-medium transition-colors">
+                                <i class="fa-solid fa-plus w-4 h-4" aria-hidden="true"></i>
+                                {{ 'sidebar.compose'|trans }}
+                            </a>
+                        {% endif %}
                     </div>
 
                     {#
@@ -534,7 +546,7 @@ which of the two is happening.
         <ul data-list-region="rows"
             data-enter-children="slide-down"
             data-enter-stagger
-            class="flex-1 overflow-y-auto divide-y divide-line">
+            class="flex-1 overflow-y-auto divide-y divide-line max-md:pb-[calc(5rem+env(safe-area-inset-bottom))]">
             {% block message_list %}{% endblock %}
         </ul>
 

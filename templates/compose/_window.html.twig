@@ -514,7 +514,7 @@ Variables: form, message, ctx (an App\Domain\DTO\Mail\ComposeContext)
                 <div class="flex items-center gap-3 px-4 pt-3 pb-1"
                      data-compose--compose-target="fromRow">
                     <span id="{{ form.vars.id }}_from_label"
-                          class="text-xs font-medium text-ink-faint w-10 shrink-0 text-right">{{ 'compose.from'|trans }}</span>
+                          class="text-xs font-medium text-ink-faint w-12 shrink-0 text-right">{{ 'compose.from'|trans }}</span>
                     <button type="button"
                             data-action="click->compose--compose#toggleFromDropdown"
                             data-compose--compose-target="fromBtn"
@@ -584,7 +584,7 @@ Variables: form, message, ctx (an App\Domain\DTO\Mail\ComposeContext)
                  class="flex {{ form.ccAddresses.vars.value is empty ? 'hidden' }} items-center gap-3 px-4 py-1.5 shrink-0 min-h-[36px]">
                 <label for="{{ form.ccAddresses.vars.id }}"
                        id="{{ form.ccAddresses.vars.id }}_label"
-                       class="text-xs font-medium text-ink-faint w-10 shrink-0 text-right">{{ 'compose.cc'|trans }}</label>
+                       class="text-xs font-medium text-ink-faint w-12 shrink-0 text-right">{{ 'compose.cc'|trans }}</label>
                 <div class="flex-1 min-w-0">
                     {{ form_widget(form.ccAddresses) }}
                 </div>
@@ -595,7 +595,7 @@ Variables: form, message, ctx (an App\Domain\DTO\Mail\ComposeContext)
                  class="flex {{ form.bccAddresses.vars.value is empty ? 'hidden' }} items-center gap-3 px-4 py-1.5 shrink-0 min-h-[36px]">
                 <label for="{{ form.bccAddresses.vars.id }}"
                        id="{{ form.bccAddresses.vars.id }}_label"
-                       class="text-xs font-medium text-ink-faint w-10 shrink-0 text-right">{{ 'compose.bcc'|trans }}</label>
+                       class="text-xs font-medium text-ink-faint w-12 shrink-0 text-right">{{ 'compose.bcc'|trans }}</label>
                 <div class="flex-1 min-w-0">
                     {{ form_widget(form.bccAddresses) }}
                 </div>
@@ -607,7 +607,7 @@ Variables: form, message, ctx (an App\Domain\DTO\Mail\ComposeContext)
             {# ── Subject ──────────────────────────────────────────── #}
             <div class="flex items-center gap-3 px-4 py-2 shrink-0">
                 <label for="{{ form.subject.vars.id }}"
-                       class="text-xs font-medium text-ink-faint w-10 shrink-0 text-right">{{ 'compose.subject_label'|trans }}</label>
+                       class="text-xs font-medium text-ink-faint w-12 shrink-0 text-right">{{ 'compose.subject_label'|trans }}</label>
                 <input type="text"
                        id="{{ form.subject.vars.id }}"
                        name="{{ form.subject.vars.full_name }}"

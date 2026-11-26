@@ -614,7 +614,7 @@ test.describe("compose localization", () => {
         for (const chinese of ["新邮件", "发件人", "收件人", "主题", "发送"]) {
             expect(text).toContain(chinese);
         }
-        for (const english of ["New Message", "Subj", "Write your message"]) {
+        for (const english of ["New Message", "Subject", "Write your message"]) {
             expect(text).not.toContain(english);
         }
         for (const name of ["最小化", "增加缩进"]) {
@@ -639,12 +639,12 @@ test.describe("compose localization", () => {
         const text = await dock.innerText();
 
         // The words the report named, in German.
-        for (const german of ["Neue Nachricht", "Von", "An", "Betr", "Senden"]) {
+        for (const german of ["Neue Nachricht", "Von", "An", "Betreff", "Senden"]) {
             expect(text).toContain(german);
         }
 
         // And none of the English it used to show beside "Serifenlos".
-        for (const english of ["New Message", "Subj", "Write your message"]) {
+        for (const english of ["New Message", "Subject", "Write your message"]) {
             expect(text).not.toContain(english);
         }
 

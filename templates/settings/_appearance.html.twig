@@ -30,8 +30,9 @@
             data-action="click->settings--appearance#pickTheme"
             class="group flex flex-col items-center gap-2 p-2 rounded-pane cursor-pointer hover:bg-hover transition-colors
                    {{ selected ? 'ring-2 ring-accent' : '' }}">
+        {% set dark = enum('App\\Domain\\Enum\\Theme\\Theme').Dark.swatch %}
         <span class="w-full h-10 rounded-lg border border-line flex items-end p-1 gap-1"
-              style="background:{{ swatch[0] }}">
+              style="background:{{ 'system' == theme.value ? 'linear-gradient(135deg, ' ~ swatch[0] ~ ' 50%, ' ~ dark[0] ~ ' 50%)' : swatch[0] }}">
             <span class="w-2 h-2 rounded-full" style="background:{{ swatch[1] }}"></span>
             <span class="w-2 h-2 rounded-full" style="background:{{ swatch[2] }}"></span>
         </span>
@@ -116,7 +117,7 @@
            that survives the generic body. #}
         <section class="min-w-0 {{ chrome.shell() }} pane-fill-card">
 
-            <header class="shrink-0 flex items-center justify-between gap-3 {{ chrome.band() }}">
+            <header class="shrink-0 flex items-center justify-between gap-3 {{ chrome.band() }} max-md:sr-only">
                 <div class="min-w-0">
                     <h2 class="text-sm font-semibold text-ink">{{ 'settings.appearance.heading'|trans }}</h2>
                     <p class="text-xs text-ink-faint mt-0.5">{{ 'settings.appearance.subheading'|trans }}</p>
