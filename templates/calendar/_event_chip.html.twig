@@ -67,7 +67,7 @@ line at rest, where a title is read far more often than in the peek.
 line.** Same information, drawn as tall as there is room for it to be: a 6px
 dot centred in a two-line agenda row or in an hour-tall grid block is a speck
 with space around it, and the bar is the mark every other calendar draws. The
-grid block ALSO carries the colour as a 10% wash over its whole area, which is
+grid block ALSO carries the colour as a wash over its whole area, which is
 enough to group a week's meetings at a glance and not enough to tell two
 similar calendars apart — and it cannot say the one thing a merged cluster has
 to say, which is that this meeting is on two calendars at once. That is the
@@ -210,6 +210,7 @@ identity is threaded through a URL that would outlive the render that made it.
 {# `??` for the reason `stack` gives below: callers pass false. #}
 {% set tooltip = tooltip ?? not monthCell %}
 {% set roomy = timeColumn or tall or monthCell %}
+{% set markBar = roomy or markBar|default(false) %}
 
 {# The month's. **A month chip is its title first, on up to two lines, and
    then when it is and where (#253).** It was the time on a line and the title
@@ -351,7 +352,7 @@ identity is threaded through a URL that would outlive the render that made it.
        query that lays the bar flat can turn the split with it; an inline
        style cannot be reached by a class any other way. #}
     {% set mark_style = 'background: '
-        ~ (roomy ? 'linear-gradient(var(--mark-split, to bottom), ' : 'conic-gradient(')
+        ~ (markBar ? 'linear-gradient(var(--mark-split, to bottom), ' : 'conic-gradient(')
         ~ slices|join(', ') ~ ')' %}
 {% else %}
     {% set mark_style = 'background-color: ' ~ event.displayColor %}
@@ -407,7 +408,7 @@ identity is threaded through a URL that would outlive the render that made it.
           focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent
           @max-[4rem]:justify-center
           {{ tall
-              ? 'h-full overflow-hidden ' ~ (stacked ? '' : 'items-start')
+              ? 'h-full overflow-hidden ' ~ (stacked ? 'grid-rows-[auto_1fr]' : 'items-start')
               : (timeColumn or stacked ? 'items-start' : 'items-center') }}
           {{ occurrence.cancelled ? 'opacity-50' : '' }}"
 >
@@ -464,7 +465,7 @@ identity is threaded through a URL that would outlive the render that made it.
        Reordering rather than printing it twice, and safe to reorder because
        `aria-hidden` means it has no place in the reading order to disturb. #}
     <span class="shrink-0 rounded-full
-                 {{ roomy ? 'w-1 self-stretch' : 'w-1.5 h-1.5' }}
+                 {{ markBar ? 'w-1 self-stretch' : 'w-1.5 h-1.5' }}
                  {# `block` with them, and it is not spare. This span is a grid
                     item in every other shape the chip takes, which blockifies
                     it; with the button collapsed to `display: block` it is an
