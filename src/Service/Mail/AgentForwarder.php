@@ -72,9 +72,11 @@ final readonly class AgentForwarder
             return null;
         }
 
-        $from = (string) ($account->displayAddress ?? $account->email);
+        // The address the forward would really go from, which is the alias
+        // the mail came in on when there is one, not the account's own.
+        $sender = $this->senderOf($this->replyDrafts->forward($original), $account, $user);
 
-        if (true === self::sealsWhatItSends($user, $from) || true === $this->sealsAny($user, $this->defaultBcc->addressesFor($account, $from))) {
+        if (true === self::sealsWhatItSends($user, $sender) || true === $this->sealsAny($user, $this->defaultBcc->addressesFor($account, $sender))) {
             return self::REFUSED_SEALED;
         }
 
@@ -104,7 +106,7 @@ final readonly class AgentForwarder
     {
         $account = $this->sendingAccount($original, $user);
 
-        if (null === $account || null !== $this->refusal($original, $user)) {
+        if (null === $account || true === $original->crypto?->isEncrypted()) {
             return null;
         }
 
@@ -112,7 +114,7 @@ final readonly class AgentForwarder
         $draft->toAddresses = [['name' => $agent->name, 'address' => $agent->address]];
         $draft->bodyHtml    = self::withNote($note, (string) $draft->bodyHtml);
 
-        $sender = $this->senders->addressFor($this->senders->tokenFor($draft, $account), $account, $user);
+        $sender = $this->senderOf($draft, $account, $user);
 
         // The builder copied the Bcc of the account the mail is in; the
         // forward goes from $sender, whose own Bcc is the one that applies.
@@ -148,6 +150,11 @@ final readonly class AgentForwarder
         );
 
         return ['draft' => $draft, 'sent' => true];
+    }
+
+    private function senderOf(Message $draft, Account $account, User $user): string
+    {
+        return $this->senders->addressFor($this->senders->tokenFor($draft, $account), $account, $user);
     }
 
     /** @param list<string> $addresses */

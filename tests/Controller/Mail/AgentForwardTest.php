@@ -8,7 +8,9 @@ use App\Domain\Enum\Crypto\ContactKeyOrigin;
 use App\Domain\Enum\Crypto\ContactKeyStatus;
 use App\Domain\Enum\Crypto\RecipientPolicy;
 use App\Entity\Crypto\ContactKey;
+use App\Domain\Enum\Account\EmailAliasSource;
 use App\Entity\Mail\Account;
+use App\Entity\Mail\EmailAlias;
 use App\Entity\Mail\Message;
 use App\Entity\Mail\MessagePart;
 use App\Entity\User\User;
@@ -248,6 +250,24 @@ final class AgentForwardTest extends WebTestCase
 
         self::assertSame(422, $client->getResponse()->getStatusCode());
         self::assertSame([], $this->queued());
+    }
+
+    public function testMailToAnAliasIsJudgedByTheAlias(): void
+    {
+        $client = $this->signIn();
+
+        $this->account->addAlias(new EmailAlias($this->account, 'alias@example.test', EmailAliasSource::Manual));
+        $this->user->ownAddressEncrypt = [(string) $this->account->email => 'always'];
+        $this->em->flush();
+
+        $message              = $this->message();
+        $message->toAddresses = [['name' => null, 'address' => 'alias@example.test']];
+        $this->em->flush();
+
+        $this->forward($client, $message, self::AGENT, '');
+
+        self::assertResponseIsSuccessful();
+        self::assertSame('alias@example.test', $this->queuedDraft()->fromAddress);
     }
 
     public function testTheBccIsTheOneOfTheAccountTheForwardGoesFrom(): void
