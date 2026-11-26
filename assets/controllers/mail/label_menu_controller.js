@@ -68,6 +68,11 @@ export default class extends Controller {
             // Bulk mode: the menu is shared by whatever is selected, so what it
             // shows has to be read from the selection each time it opens.
             this._syncFromSelection();
+
+            // Where Escape gives the focus back: the opener is not always this
+            // element's own button, which the More menu and the action sheet
+            // keep out of sight.
+            this._opener = document.activeElement;
             this._startFilter();
 
             document.addEventListener("click", this._boundClose, { capture: true });
@@ -118,18 +123,29 @@ export default class extends Controller {
         this._activate("" === query ? null : this._shown()[0] ?? null);
     }
 
-    /** The keys of an open panel: ↓ and ↑ through the entries, Enter, Escape. */
+    /**
+     * The keys of an open panel: ↓ and ↑ through the entries, Enter, Escape.
+     *
+     * Enter is the filter's only. On an entry that has the focus — tabbed to,
+     * or clicked, since a label's click leaves the panel open — it is the
+     * browser's, and presses that entry rather than the highlighted one.
+     */
     navigate(event) {
+        // Enter and the arrows belong to the input method while it composes.
+        if (event.isComposing) {
+            return;
+        }
+
         if ("Escape" === event.key) {
             event.preventDefault();
             event.stopPropagation();
             this._close();
-            this.element.querySelector("button[data-action*='#toggle']")?.focus();
+            this._focusOpener();
 
             return;
         }
 
-        if ("Enter" === event.key && this._active) {
+        if ("Enter" === event.key && this.hasFilterTarget && event.target === this.filterTarget && this._active) {
             event.preventDefault();
             this._active.click();
 
@@ -221,6 +237,15 @@ export default class extends Controller {
         if (false === window.matchMedia("(pointer: coarse)").matches) {
             this.filterTarget.focus({ preventScroll: true });
         }
+    }
+
+    _focusOpener() {
+        const toggle = this.element.querySelector("button[data-action*='#toggle']");
+        const back = [this._opener, toggle].find(
+            (element) => element instanceof HTMLElement && element.isConnected && element !== document.body && element.checkVisibility(),
+        );
+
+        back?.focus({ preventScroll: true });
     }
 
     /** What the filter narrows: every entry with a label id or a place. */

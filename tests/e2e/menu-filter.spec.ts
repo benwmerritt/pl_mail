@@ -1,5 +1,5 @@
 import { test, expect } from "./support/test";
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { INBOX_SUBJECTS, mailRow, seed } from "./support/config";
 
 /**
@@ -13,6 +13,9 @@ import { INBOX_SUBJECTS, mailRow, seed } from "./support/config";
 const reading = (page: Page) => page.locator('[data-mail--mail-pane-target="reading"]');
 const filter = (page: Page) => reading(page).getByRole("textbox", { name: "Type to filter" }).locator("visible=true");
 
+/** The keyboard's highlight is the bare `bg-hover` class; `hover:bg-hover` is the mouse's and always there. */
+const highlighted = (entry: Locator) => entry.evaluate((element) => element.classList.contains("bg-hover"));
+
 async function openConversation(page: Page): Promise<void> {
     await page.goto("/mail/inbox");
     await mailRow(page, INBOX_SUBJECTS.read).click();
@@ -25,11 +28,12 @@ test.beforeEach(() => {
 });
 
 test.describe("label menu filter", () => {
-    test("l, a few letters and Enter put the label on; Escape closes", async ({ page }) => {
+    test("l, a few letters, the arrows and Enter put the label on; Escape closes", async ({ page }) => {
         await openConversation(page);
 
         const panel = reading(page).locator('[data-mail--label-menu-target="panel"]');
         const entry = panel.locator("[data-label-id]", { hasText: "E2E Label" });
+        const create = panel.locator('[data-mail--label-menu-target="create"]');
 
         await page.keyboard.press("l");
         await expect(panel).toBeVisible();
@@ -40,8 +44,16 @@ test.describe("label menu filter", () => {
 
         // Narrowed to what matches, with the keyboard on the first of it.
         await expect(entry).toBeVisible();
-        await expect(entry).toHaveClass(/\bbg-hover\b/);
         await expect(panel.locator("[data-label-id]:not(.hidden)")).toHaveCount(1);
+        await expect.poll(() => highlighted(entry)).toBe(true);
+
+        // Down to Create new and back up: Enter goes where the highlight is.
+        await page.keyboard.press("ArrowDown");
+        await expect.poll(() => highlighted(create)).toBe(true);
+        await expect.poll(() => highlighted(entry)).toBe(false);
+
+        await page.keyboard.press("ArrowUp");
+        await expect.poll(() => highlighted(entry)).toBe(true);
 
         await page.keyboard.press("Enter");
         await expect(entry).toHaveAttribute("data-attached", "true");
@@ -86,7 +98,7 @@ test.describe("move menu filter", () => {
 
         // Down from the only match wraps back onto it.
         await page.keyboard.press("ArrowDown");
-        await expect(menu.getByRole("menuitem", { name: "E2E Folder" })).toHaveClass(/\bbg-hover\b/);
+        await expect.poll(() => highlighted(menu.getByRole("menuitem", { name: "E2E Folder" }))).toBe(true);
 
         await page.keyboard.press("Enter");
 
