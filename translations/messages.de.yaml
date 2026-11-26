@@ -2956,6 +2956,11 @@ header:
 inbox:
     empty: Keine Nachrichten in diesem Tab.
     empty_account: In diesem Konto ist noch nichts angekommen.
+    zero:
+        heading: "Posteingang leer."
+        heading_tab: "Hier ist nichts."
+        body: "Alles erledigt. Genieß die Ruhe."
+        days: "An %count% der letzten 7 Tage leer"
 
 insights:
     card:

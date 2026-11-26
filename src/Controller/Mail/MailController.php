@@ -30,6 +30,7 @@ use App\Service\Ai\ThreadSummaryStore;
 use App\Service\Ai\ThreadTranscript;
 use App\Service\Mail\BinView;
 use App\Service\Mail\InboxTabs;
+use App\Service\Mail\InboxZeroDays;
 use App\Service\Mail\MailLists;
 use App\Service\Mail\MailPlacement;
 use App\Service\Mail\NewMailMarkers;
@@ -299,6 +300,7 @@ final class MailController extends AbstractController
     #[Route('/inbox/{inbox}', name: 'inbox', requirements: ['inbox' => '\d+'], defaults: ['inbox' => null])]
     public function inbox(
         Request $request,
+        InboxZeroDays $inboxZero,
         ?int $inbox = null,
     ): Response {
         $user = $this->getUser();
@@ -387,6 +389,14 @@ final class MailController extends AbstractController
             'per_page'    => self::PER_PAGE,
             'list_sort'   => $sort,
             'unread_only' => $unreadOnly,
+            // The picture an emptied list turns into (BMAIL-15). Only on the
+            // first page of the whole list: an empty second page or an empty
+            // unread filter is not zero. Only Primary, or the one list with
+            // the tabs off, counts towards the week.
+            'inbox_zero'  => 1 === $page && false === $unreadOnly ? [
+                'week'   => $inboxZero->week($user, $request->getLocale()),
+                'counts' => null === $tab || MessageCategory::Primary->value === $tab->value,
+            ] : null,
         ]);
     }
 

@@ -329,15 +329,17 @@
 {% endblock %}
 
 {% block message_list %}
-    {% if threads is empty %}
+    {% for thread in threads %}
+        {% include '_partials/_thread_row.html.twig' with {
+            thread: thread,
+        } %}
+    {% endfor %}
+
+    {% if inbox_zero is not null %}
+        {% include 'mail/_inbox_zero.html.twig' with { zero: inbox_zero } %}
+    {% elseif threads is empty %}
         <li class="px-4 py-8 text-center text-sm text-ink-faint">
             {{ 'inbox.empty'|trans }}
         </li>
-    {% else %}
-        {% for thread in threads %}
-            {% include '_partials/_thread_row.html.twig' with {
-                thread: thread,
-            } %}
-        {% endfor %}
     {% endif %}
 {% endblock %}

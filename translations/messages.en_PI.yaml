@@ -2836,6 +2836,11 @@ header:
 inbox:
     empty: No bottles in this here tab.
     empty_account: Nothin' has washed ashore for this account yet.
+    zero:
+        heading: "Not a letter on the horizon."
+        heading_tab: "Naught in this hold."
+        body: "Every letter dealt with. Enjoy the calm seas."
+        days: "Clear decks on %count% o' the last 7 days"
 
 insights:
     card:

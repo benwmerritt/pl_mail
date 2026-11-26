@@ -2952,6 +2952,11 @@ header:
 inbox:
     empty: No messages in this tab.
     empty_account: Nothing has arrived in this account yet.
+    zero:
+        heading: "Inbox zero."
+        heading_tab: "Nothing here."
+        body: "Everything has been dealt with. Enjoy the quiet."
+        days: "Clear on %count% of the last 7 days"
 
 insights:
     card:

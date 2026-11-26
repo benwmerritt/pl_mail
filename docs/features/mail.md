@@ -319,6 +319,19 @@ goes to your administrator under [Reported mail](admin.md#reported-mail), with t
 the evidence behind them — which is what a rule or a prompt gets changed on the strength of. It sends
 the sender, the subject and the decision; it does not send the message.
 
+## Inbox zero
+
+When the inbox has nothing left in it, the list turns into a quiet picture rather than an empty
+box. It is drawn from your theme's colours, inside the page, so it changes with the theme and loads
+nothing from anywhere else. Archiving the last conversation shows it at once.
+
+Under it is the last seven days, one dot each, filled on the days the inbox reached zero, with a
+count beneath ("Clear on 3 of the last 7 days"). Point at a dot for its date. A day counts when
+**Primary** is empty, or the one list if you have the tabs off, on your own calendar in the time zone
+from your settings. The other tabs show the picture when they are empty but do not count, and
+neither do a later page or the unread filter. The days are kept with your settings, a fortnight at a
+time.
+
 ## What a list row shows
 
 **Settings → Inbox → Message list** decides what each row in the mail list carries. Every default is

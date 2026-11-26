@@ -6718,3 +6718,19 @@ li[data-swipe-side] > [data-swipe-content] {
     outline-offset: 2px;
     border-radius:  var(--app-radius);
 }
+
+/* ═══ Inbox zero (BMAIL-15) ═════════════════════════════════════════════════
+   mail/_inbox_zero.html.twig is drawn after the rows whether or not there are
+   any, and shows only once no row stands in front of it. A row hidden by
+   optimistic_rows.js is on its way out, so it does not count: archiving the
+   last row shows the picture at once, and putting the row back after a failed
+   request hides it again, with no script involved either way.
+   ═══════════════════════════════════════════════════════════════════════════ */
+li[data-controller~="mail--message-row"]:not([hidden]) ~ .inbox-zero {
+    display: none;
+}
+
+.inbox-zero-dot[data-reached] {
+    background-color: rgb(var(--rgb-accent));
+    border-color:     rgb(var(--rgb-accent));
+}

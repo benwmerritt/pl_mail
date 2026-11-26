@@ -2969,6 +2969,11 @@ header:
 inbox:
     empty: Aucun message dans cet onglet.
     empty_account: Rien n’est encore arrivé dans ce compte.
+    zero:
+        heading: "Boîte de réception vide."
+        heading_tab: "Rien ici."
+        body: "Tout est traité. Profitez du calme."
+        days: "Vide %count% jours sur les 7 derniers"
 
 insights:
     card:

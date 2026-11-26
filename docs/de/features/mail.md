@@ -1,4 +1,4 @@
-<!-- translated-from: features/mail.md sha1:12c0b4b23ac770a2e65e657f864d3f46fe6a1428 -->
+<!-- translated-from: features/mail.md sha1:68acd5a86d063e5877119816ea854e06a94dfd5b -->
 
 # Mail
 
@@ -355,6 +355,20 @@ Ist es schlicht falsch, sagst du mit **Melden** unten im Bereich, wohin es gehö
 bei deiner Administration unter [Gemeldete Mails](admin.md#gemeldete-mails), zusammen mit den drei
 Urteilen und den Belegen dahinter — daraus wird eine Regel oder eine Anweisung geändert. Gesendet
 werden Absender, Betreff und die Entscheidung; die Nachricht selbst nicht.
+
+## Inbox Zero
+
+Wenn im Posteingang nichts mehr liegt, wird aus der Liste ein ruhiges Bild statt einer leeren
+Fläche. Es ist aus den Farben deines Themes gezeichnet, direkt in der Seite, wechselt also mit dem
+Theme und lädt nichts von anderswo. Archivierst du die letzte Konversation, erscheint es sofort.
+
+Darunter stehen die letzten sieben Tage, je ein Punkt, gefüllt an den Tagen, an denen der Posteingang
+leer wurde, mit einer Zahl darunter („An 3 der letzten 7 Tage leer“). Zeig auf einen Punkt, um sein
+Datum zu sehen. Ein Tag zählt, wenn **Allgemein** leer ist, oder die eine Liste, wenn du die Tabs
+ausgeschaltet hast, nach deinem eigenen Kalender in der Zeitzone aus deinen Einstellungen. Die
+anderen Tabs zeigen das Bild, wenn sie leer sind, zählen aber nicht, und ebenso wenig eine spätere
+Seite oder der Filter für Ungelesenes. Die Tage werden bei deinen Einstellungen gespeichert, jeweils
+zwei Wochen.
 
 ## Was eine Listenzeile zeigt
 
