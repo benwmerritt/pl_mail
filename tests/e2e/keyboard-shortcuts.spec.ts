@@ -1,6 +1,6 @@
 import { test, expect } from "./support/test";
 import type { Locator, Page } from "@playwright/test";
-import { INBOX_SUBJECTS, mailRow, seed } from "./support/config";
+import { INBOX_SUBJECTS, ajaxPost, mailRow, seed } from "./support/config";
 import { saveSetting } from "./support/settings";
 
 /**
@@ -392,6 +392,99 @@ test.describe("keyboard shortcuts", () => {
         await expect(page.locator(".app-tooltip[data-state='visible']")).toHaveText("Archive (e)");
         await page.waitForTimeout(100);
         await expect(archive).not.toHaveAttribute("title");
+    });
+
+    test("g then b goes to Snoozed", async ({ page }) => {
+        await inbox(page);
+
+        await page.keyboard.press("g");
+        await page.keyboard.press("b");
+        await expect(page).toHaveURL(/\/mail\/snoozed/);
+    });
+
+    test("Shift+J and Shift+K select a run of rows", async ({ page }) => {
+        await inbox(page);
+
+        const ids = await page.locator(ROWS).evaluateAll((rows) =>
+            rows.map((row) => row.getAttribute("data-mail--message-row-id-value")));
+
+        await page.keyboard.press("j");
+        await page.keyboard.press("Shift+J");
+        await expect(page.locator(COUNT)).toHaveText("2");
+        await expect(page.locator(CURSOR)).toHaveAttribute("data-mail--message-row-id-value", ids[1]!);
+
+        await page.keyboard.press("Shift+J");
+        await expect(page.locator(COUNT)).toHaveText("3");
+        await expect(page.locator(CURSOR)).toHaveAttribute("data-mail--message-row-id-value", ids[2]!);
+
+        // Back up over the run: what is ticked stays ticked.
+        await page.keyboard.press("Shift+K");
+        await expect(page.locator(COUNT)).toHaveText("3");
+        await expect(page.locator(CURSOR)).toHaveAttribute("data-mail--message-row-id-value", ids[1]!);
+    });
+
+    test("Escape goes back to the list, after closing an open menu first", async ({ page }) => {
+        await inbox(page);
+
+        const reading = page.locator('[data-mail--mail-pane-target="reading"]');
+        const panel = reading.locator('[data-mail--label-menu-target="panel"]');
+
+        await page.keyboard.press("j");
+        await page.keyboard.press("o");
+        await expect(reading).toBeVisible();
+
+        await page.keyboard.press("l");
+        await expect(panel).toBeVisible();
+
+        await page.keyboard.press("Escape");
+        await expect(panel).toBeHidden();
+        await expect(reading).toBeVisible();
+        await expect(page).toHaveURL(/\/mail\/(thread|message)\//);
+
+        await page.keyboard.press("Escape");
+        await expect(page.locator(ROWS).first()).toBeVisible();
+        await expect(page).toHaveURL(/\/mail\/inbox/);
+    });
+
+    test("Tab and Shift+Tab switch inbox tabs while nothing has the focus", async ({ page }) => {
+        // The fixture is all Primary, and the strip only shows when more than
+        // one category holds mail; category-tabs-history.spec.ts does the same.
+        await page.goto("/mail/inbox");
+
+        for (const [subject, category] of [
+            [INBOX_SUBJECTS.star, "social"],
+            [INBOX_SUBJECTS.archive, "promotions"],
+        ] as const) {
+            const id = Number((await mailRow(page, subject).getAttribute("id"))?.replace("thread_", ""));
+            expect((await ajaxPost(page, "/status/bulk/category", { ids: [id], category })).ok()).toBe(true);
+        }
+
+        await inbox(page);
+
+        const tabs = page.locator("a[data-category-tab-link]");
+        const current = page.locator('a[data-category-tab-link][aria-current="page"]');
+        const hrefs = await tabs.evaluateAll((links) => links.map((link) => link.getAttribute("href")!));
+        expect(hrefs.length).toBeGreaterThan(2);
+
+        // Primary, where the inbox opens, is the first of them.
+        await expect(current).toHaveAttribute("href", hrefs[0]!);
+
+        await page.keyboard.press("Tab");
+        await expect(current).toHaveAttribute("href", hrefs[1]!);
+
+        await page.keyboard.press("Shift+Tab");
+        await expect(current).toHaveAttribute("href", hrefs[0]!);
+
+        // Round from the first to the last.
+        await page.keyboard.press("Shift+Tab");
+        await expect(current).toHaveAttribute("href", hrefs.at(-1)!);
+
+        // A row with the focus is somebody walking the page: Tab is theirs.
+        await expect(page.locator(ROWS).first()).toBeVisible();
+        await page.locator(ROWS).first().focus();
+        await page.keyboard.press("Tab");
+        await expect(page.locator(ROWS).first()).not.toBeFocused();
+        await expect(current).toHaveAttribute("href", hrefs.at(-1)!);
     });
 
     test("switched off, a key is only a key", async ({ page }) => {

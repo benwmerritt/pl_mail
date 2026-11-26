@@ -61,6 +61,41 @@ const TOOLBAR = "[data-mail--list-toolbar-target='actions']";
 const READING = "[data-surface='reading']";
 const LIST = "[data-surface='list']";
 
+/** The inbox's category tabs, in the order the strip draws them. */
+const TAB_LINKS = "a[data-category-tab-link]";
+
+/**
+ * What Escape closes while it is on screen, ahead of the open conversation.
+ * Most of these close from a listener of their own that leaves no mark on
+ * the event, added when they open and so run after this one: they have to
+ * be asked rather than heard from. Named one by one because a target name is
+ * not enough — the search bar is a "panel" too, and always on screen.
+ */
+const CLOSES_ON_ESCAPE = [
+    "[data-ui--dropdown-target~='menu']",
+    "[data-ui--user-menu-target~='menu']",
+    "[data-mail--label-menu-target~='panel']",
+    "[data-mail--move-menu-target~='panel']",
+    "[data-mail--spam-menu-target~='panel']",
+    "[data-mail--message-actions-target~='panel']",
+    "[data-mail--message-details-target~='panel']",
+    "[data-mail--action-sheet-target~='panel']",
+    "[data-mail--search-target~='dropdown']",
+].join(", ");
+
+/**
+ * The same, for what is always on screen and says it is open instead: the
+ * search box widened on a phone, the sidebar slid in, and a button that has
+ * opened its popup (the rows' snooze and spam menus are drawn far from their
+ * rows). Only a popup's button — a sidebar section is expanded too, all the
+ * time.
+ */
+const SAYS_OPEN = [
+    "#search-shell[data-open='true']",
+    "[data-ui--sidebar-drawer-target~='drawer'].translate-x-0",
+    "[aria-haspopup][aria-expanded='true']",
+].join(", ");
+
 /** How long a first key (`g`, `*`) waits for its second. */
 const SEQUENCE_MS = 1500;
 
@@ -317,6 +352,14 @@ export default class extends Controller {
             return;
         }
 
+        if ("Tab" === key) {
+            if (true === this.#switchTab(event, true === event.shiftKey ? -1 : 1)) {
+                event.preventDefault();
+            }
+
+            return;
+        }
+
         if (true === this.#first(key)) {
             event.preventDefault();
         }
@@ -356,6 +399,31 @@ export default class extends Controller {
         return true;
     }
 
+    /**
+     * Tab or Shift+Tab: the next or the previous of the inbox's tabs, round
+     * from the last to the first. Only while nothing has the focus — the rule
+     * the arrows keep, and for the same reason: Tab is how the page is walked
+     * from the keyboard, and a row, a button or a link with the focus is
+     * somebody doing exactly that. Keys pressed from `j`, `k`, `o` and `u`
+     * never move the focus, so for them nothing has it.
+     */
+    #switchTab(event, delta) {
+        if (true === event.fromFrame || document.body !== event.target || false === this.#listShowing()) {
+            return false;
+        }
+
+        const tabs = [...document.querySelectorAll(TAB_LINKS)];
+
+        if (tabs.length < 2) {
+            return false;
+        }
+
+        const at = tabs.findIndex((tab) => "page" === tab.getAttribute("aria-current"));
+        const next = -1 === at ? (delta > 0 ? 0 : tabs.length - 1) : (at + delta + tabs.length) % tabs.length;
+
+        return this.#press(tabs[next]);
+    }
+
     /** A single key. Answers whether it did anything. */
     #first(key) {
         if (true === Object.hasOwn(ACTS, key)) {
@@ -378,6 +446,9 @@ export default class extends Controller {
             case "o":
             case "Enter": return this.#openCursor();
             case "x": return this.#tickCursor();
+            case "J": return this.#extend(1);
+            case "K": return this.#extend(-1);
+            case "Escape": return this.#escape();
 
             // Reply to all, and a plain reply where there is nobody else to
             // include. The Reply-all link is only drawn for a message with more
@@ -594,6 +665,64 @@ export default class extends Controller {
         const box = row.querySelector(ROW_SELECT);
 
         return null !== box && this.#tick(row, false === box.checked);
+    }
+
+    /**
+     * Shift+J or Shift+K: the row under the cursor and the one below or above
+     * it ticked, and the cursor on to that one — pressed again, the selection
+     * grows a row at a time. With a conversation open its row is where it
+     * starts from, as `j` does.
+     */
+    #extend(delta) {
+        if (false === this.#listShowing()) {
+            return false;
+        }
+
+        const rows = this.#rows();
+
+        if (0 === rows.length) {
+            return false;
+        }
+
+        if (null !== this.#reading()) {
+            this.#followOpen();
+        }
+
+        const from = this.#cursorRow() ?? rows[0];
+        const to = rows[rows.indexOf(from) + delta] ?? from;
+
+        this.#tick(from, true);
+        this.#tick(to, true);
+
+        if (null !== document.activeElement?.closest?.(ROW)) {
+            this.#focusRow(to);
+
+            return true;
+        }
+
+        cursorId = to.getAttribute(ROW_ID);
+        this.#paint();
+        to.scrollIntoView({ block: "nearest" });
+
+        return true;
+    }
+
+    /** Escape: back to the list, as `u` — unless something open is Escape's. */
+    #escape() {
+        if (true === this.#somethingOpen()) {
+            return false;
+        }
+
+        return this.#press(this.#reading()?.querySelector(OPEN.back));
+    }
+
+    /** Whether something Escape closes first is open: see CLOSES_ON_ESCAPE. */
+    #somethingOpen() {
+        if (null !== document.querySelector(SAYS_OPEN)) {
+            return true;
+        }
+
+        return [...document.querySelectorAll(CLOSES_ON_ESCAPE)].some((element) => element.checkVisibility());
     }
 
     /** The checkbox and the event the toolbar listens for — see mail--message-row. */
