@@ -1987,7 +1987,7 @@ calendar:
         calendars: 'Calendars'
         count: '%count% of %total%'
         custom: 'Custom'
-        default_always: 'The default calendar is always shown'
+        default_always: 'Always shown'
         heading: 'Sets'
         local: 'plMail'
         manage: 'Rename or delete sets'

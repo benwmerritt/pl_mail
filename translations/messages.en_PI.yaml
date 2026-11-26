@@ -1904,7 +1904,7 @@ calendar:
         calendars: 'Charts'
         count: '%count% of %total%'
         custom: 'Yer own pick'
-        default_always: 'The home chart be always shown'
+        default_always: 'Always on deck'
         heading: 'Fleets'
         local: 'plMail'
         manage: 'Rename or scuttle fleets'

@@ -1779,7 +1779,7 @@ calendar:
         calendars: '日历'
         count: '%count% / %total%'
         custom: '自定义'
-        default_always: '默认日历始终显示'
+        default_always: '始终显示'
         heading: '日历组'
         local: 'plMail'
         manage: '重命名或删除日历组'

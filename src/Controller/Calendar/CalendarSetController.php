@@ -54,8 +54,12 @@ final class CalendarSetController extends AbstractController
     {
         $this->assertCsrf($request, self::CSRF);
 
-        $this->sets->saveVisible($user, $request->request->getString('name'));
-        $this->em->flush();
+        $name = trim($request->request->getString('name'));
+
+        if ('' !== $name) {
+            $this->sets->saveVisible($user, $name);
+            $this->em->flush();
+        }
 
         return $this->back($request);
     }
@@ -72,8 +76,13 @@ final class CalendarSetController extends AbstractController
     #[Route('/{id}/rename', name: 'rename', requirements: ['id' => '[0-9a-f]+'], methods: ['POST'])]
     public function rename(Request $request, #[CurrentUser] User $user, string $id): RedirectResponse
     {
-        $this->sets->rename($user, $this->owned($request, $user, $id), $request->request->getString('name'));
-        $this->em->flush();
+        $set  = $this->owned($request, $user, $id);
+        $name = trim($request->request->getString('name'));
+
+        if ('' !== $name) {
+            $this->sets->rename($user, $set, $name);
+            $this->em->flush();
+        }
 
         return $this->back($request);
     }
@@ -87,14 +96,14 @@ final class CalendarSetController extends AbstractController
         return $this->back($request);
     }
 
-    /** Shows or hides one calendar. The default stays shown, as in settings. */
+    /** Shows or hides one calendar. The default can be shown but not hidden, as in settings. */
     #[Route('/calendar/{id}/toggle', name: 'toggle_calendar', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function toggleCalendar(Request $request, Calendar $calendar): RedirectResponse
     {
         $this->denyAccessUnlessGranted(OwnershipVoter::OWN, $calendar);
         $this->assertCsrf($request, self::CSRF);
 
-        if (false === $calendar->isDefault) {
+        if (false === ($calendar->isDefault && $calendar->isVisible)) {
             $calendar->isVisible = false === $calendar->isVisible;
             $this->em->flush();
         }
@@ -109,12 +118,16 @@ final class CalendarSetController extends AbstractController
         return $this->sets->find($user, $id) ?? throw $this->createNotFoundException();
     }
 
-    /** Back to the local page the form was on, and never anywhere else. */
+    /**
+     * Back to the local page the form was on, and never anywhere else: the
+     * rule CalendarController::safeReturnTo() explains, `/\t/evil.test`
+     * included.
+     */
     private function back(Request $request): RedirectResponse
     {
         $return = $request->request->getString('return');
 
-        if (1 !== preg_match('#^/(?![/\\\\])#', $return)) {
+        if (1 !== preg_match('#^/(?![/\\\\])[^\x00-\x20\x7F\\\\]*$#D', $return)) {
             $return = $this->generateUrl('app_calendar_index');
         }
 

@@ -1997,7 +1997,7 @@ calendar:
         calendars: 'Calendriers'
         count: '%count% sur %total%'
         custom: 'Personnalisé'
-        default_always: 'Le calendrier par défaut est toujours affiché'
+        default_always: 'Toujours affiché'
         heading: 'Ensembles'
         local: 'plMail'
         manage: 'Renommer ou supprimer des ensembles'

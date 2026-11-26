@@ -60,21 +60,33 @@ final readonly class CalendarSets
     }
 
     /**
-     * The set whose calendars are exactly the visible ones, if any.
+     * The set whose calendars are exactly the visible ones, if any. The set
+     * last picked wins when two sets hold the same calendars.
      *
      * @param list<Calendar> $calendars every calendar the user owns
      */
     public function active(User $user, array $calendars): ?CalendarSet
     {
         $visible = $this->ids(array_filter($calendars, static fn (Calendar $c): bool => true === $c->isVisible));
+        $last    = $this->last($user);
 
-        foreach ($this->all($user) as $set) {
+        foreach (null === $last ? $this->all($user) : [$last, ...$this->all($user)] as $set) {
             if ($this->effectiveIds($set, $calendars) === $visible) {
                 return $set;
             }
         }
 
         return null;
+    }
+
+    /**
+     * How many calendars applying the set would show.
+     *
+     * @param list<Calendar> $calendars every calendar the user owns
+     */
+    public function size(CalendarSet $set, array $calendars): int
+    {
+        return count($this->effectiveIds($set, $calendars));
     }
 
     public function last(User $user): ?CalendarSet
@@ -183,8 +195,6 @@ final readonly class CalendarSets
 
     private function cleanName(string $name): string
     {
-        $name = trim($name);
-
-        return mb_substr('' === $name ? 'Set' : $name, 0, self::MAX_NAME_LENGTH);
+        return mb_substr(trim($name), 0, self::MAX_NAME_LENGTH);
     }
 }

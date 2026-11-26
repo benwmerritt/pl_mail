@@ -5,22 +5,24 @@ switch between groups of them, and saving what is showing as a set.
 Every form posts to CalendarSetController and comes back to `returnUrl`. Inside
 the docked pane the forms are inside its Turbo Frame, so only the pane redraws.
 Ticking a calendar comes back with `sets=1`, which reopens the menu so several
-can be ticked in a row.
+can be ticked in a row, and `focus`, which puts focus back on the row ticked.
+
+The menu opens in the top layer (`place: above`), because the docked pane
+clips anything that overflows it.
 
 Variables:
   returnUrl  string  the page to come back to
 #}
 {% set menu = calendar_sets_menu() %}
 {% set label = menu.active ? menu.active.name : (menu.sets is empty ? 'calendar.sets.button'|trans : 'calendar.sets.custom'|trans) %}
-{% set returnUrl = returnUrl|replace({'?sets=1&': '?', '&sets=1': '', '?sets=1': ''}) %}
 {% set reopenUrl = returnUrl ~ ('?' in returnUrl ? '&' : '?') ~ 'sets=1' %}
+{% set focusId = app.request.query.getInt('focus') %}
 {% set token = csrf_token(constant('App\\Controller\\Calendar\\CalendarSetController::CSRF')) %}
 
-<div class="relative shrink-0" data-controller="ui--dropdown" data-calendar-sets
+<div class="relative shrink-0" data-controller="ui--dropdown" data-ui--dropdown-place-value="above" data-calendar-sets
      {% if app.request.query.getBoolean('sets') %}data-ui--dropdown-open-value="true"{% endif %}>
     <button type="button"
             data-action="click->ui--dropdown#toggle"
-            aria-haspopup="true"
             title="{{ 'calendar.sets.title'|trans({'%count%': menu.visible|length, '%total%': menu.total}) }}"
             class="flex items-center gap-1.5 h-8 px-2 rounded-lg text-xs text-ink-muted hover:bg-hover hover:text-ink transition-colors cursor-pointer
                    @max-[37rem]/toolbar:h-7 @max-[37rem]/toolbar:px-1.5 @max-[22rem]/toolbar:h-6">
@@ -30,7 +32,7 @@ Variables:
                       style="background-color: {{ calendar.color }}"></span>
             {% endfor %}
         </span>
-        <span class="max-w-28 truncate @max-[40rem]/toolbar:sr-only" data-calendar-set-label>{{ label }}</span>
+        <span class="max-w-28 truncate @max-[22rem]/toolbar:sr-only" data-calendar-set-label>{{ label }}</span>
         <i class="fa-solid fa-chevron-down text-[9px]" aria-hidden="true"></i>
     </button>
 
@@ -66,22 +68,26 @@ Variables:
             {% for source, calendars in menu.groups %}
                 <p class="px-3 pt-1.5 text-[10px] text-ink-faint truncate">{{ source ?: 'calendar.sets.local'|trans }}</p>
                 {% for calendar in calendars %}
+                    {% set locked = calendar.isDefault and calendar.isVisible %}
                     <form method="post" action="{{ path('app_calendar_set_toggle_calendar', {id: calendar.id}) }}">
                         <input type="hidden" name="_token" value="{{ token }}">
-                        <input type="hidden" name="return" value="{{ reopenUrl }}">
+                        <input type="hidden" name="return" value="{{ reopenUrl }}&focus={{ calendar.id }}">
                         <button type="submit"
-                                role="menuitemcheckbox"
-                                aria-checked="{{ calendar.isVisible ? 'true' : 'false' }}"
-                                data-calendar-toggle="{{ calendar.name }}"
-                                {% if calendar.isDefault %}disabled title="{{ 'calendar.sets.default_always'|trans }}"{% endif %}
+                                aria-pressed="{{ calendar.isVisible ? 'true' : 'false' }}"
+                                data-calendar-visibility="{{ calendar.name }}"
+                                {% if focusId == calendar.id %}autofocus{% endif %}
+                                {% if locked %}aria-disabled="true" aria-describedby="calendar-sets-default-{{ calendar.id }}"{% endif %}
                                 class="w-full flex items-center gap-2.5 px-3 py-1 text-left transition-colors
-                                       {{ calendar.isDefault ? 'cursor-default' : 'hover:bg-hover cursor-pointer' }}">
+                                       {{ locked ? 'cursor-default' : 'hover:bg-hover cursor-pointer' }}">
                             <span class="w-3.5 h-3.5 shrink-0 rounded flex items-center justify-center border-[1.5px]"
                                   style="border-color: {{ calendar.color }};{% if calendar.isVisible %} background-color: {{ calendar.color }};{% endif %}"
                                   aria-hidden="true">
                                 {% if calendar.isVisible %}<i class="fa-solid fa-check text-[8px]" style="color: {{ calendar.color|calendar_on_color }}"></i>{% endif %}
                             </span>
                             <span class="flex-1 truncate {{ calendar.isVisible ? 'text-ink' : 'text-ink-faint' }}">{{ calendar.name }}</span>
+                            {% if locked %}
+                                <span id="calendar-sets-default-{{ calendar.id }}" class="text-[10px] text-ink-faint whitespace-nowrap">{{ 'calendar.sets.default_always'|trans }}</span>
+                            {% endif %}
                         </button>
                     </form>
                 {% endfor %}

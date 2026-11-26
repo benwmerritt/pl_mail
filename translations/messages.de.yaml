@@ -2014,7 +2014,7 @@ calendar:
         calendars: 'Kalender'
         count: '%count% von %total%'
         custom: 'Eigene Auswahl'
-        default_always: 'Der Standardkalender wird immer angezeigt'
+        default_always: 'Immer sichtbar'
         heading: 'Sets'
         local: 'plMail'
         manage: 'Sets umbenennen oder löschen'

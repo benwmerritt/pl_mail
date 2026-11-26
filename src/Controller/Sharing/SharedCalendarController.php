@@ -124,7 +124,7 @@ final class SharedCalendarController extends AbstractController
             // a route attribute is compiled from constant expressions, which a
             // method call is not. The same duplication the authenticated
             // calendar's route carries, for the same reason.
-            'view'  => 'day|3days|week|month|agenda',
+            'view'  => 'day|week|month|agenda',
             'date'  => '\d{4}-\d{2}-\d{2}',
         ],
         defaults: ['view' => 'month', 'date' => null],

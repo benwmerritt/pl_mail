@@ -12,6 +12,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 
 /**
@@ -44,11 +45,11 @@ final class CalendarSetsTest extends WebTestCase
 
         $menu = $this->menu();
 
-        self::assertSame(['Personal', 'Work', 'Gym'], $menu->filter('[data-calendar-toggle]')->each(
-            static fn (Crawler $row): string => (string) $row->attr('data-calendar-toggle'),
+        self::assertSame(['Personal', 'Work', 'Gym'], $menu->filter('[data-calendar-visibility]')->each(
+            static fn (Crawler $row): string => (string) $row->attr('data-calendar-visibility'),
         ));
-        self::assertSame(['true', 'true', 'false'], $menu->filter('[data-calendar-toggle]')->each(
-            static fn (Crawler $row): string => (string) $row->attr('aria-checked'),
+        self::assertSame(['true', 'true', 'false'], $menu->filter('[data-calendar-visibility]')->each(
+            static fn (Crawler $row): string => (string) $row->attr('aria-pressed'),
         ));
     }
 
@@ -84,7 +85,18 @@ final class CalendarSetsTest extends WebTestCase
         $this->post('toggle', 'Personal');
 
         self::assertTrue($this->visibility()['Personal']);
-        self::assertNotNull($this->menu()->filter('[data-calendar-toggle="Personal"]')->attr('disabled'));
+        self::assertSame('true', $this->menu()->filter('[data-calendar-visibility="Personal"]')->attr('aria-disabled'));
+    }
+
+    /** A restored backup can leave the default hidden; the menu can still show it. */
+    public function testAHiddenDefaultCanBeShownAgain(): void
+    {
+        $this->signIn();
+        $this->connection->executeStatement('UPDATE calendar SET is_visible = false WHERE id = ?', [$this->ids['Personal']]);
+
+        $this->post('toggle', 'Personal');
+
+        self::assertTrue($this->visibility()['Personal']);
     }
 
     /** Ticking by hand after picking a set is no longer that set, and offers to update it. */
@@ -117,13 +129,32 @@ final class CalendarSetsTest extends WebTestCase
         self::assertSame([], $this->sets());
     }
 
-    public function testItOnlyEverReturnsWithinPlMail(): void
+    public function testABlankNameSavesNothing(): void
     {
         $this->signIn();
 
-        $this->client->request('POST', '/calendar/sets', ['_token' => $this->token(), 'name' => 'Work', 'return' => '//evil.example/']);
+        $this->save('   ');
+
+        self::assertSame([], $this->sets());
+    }
+
+    #[DataProvider('foreignReturns')]
+    public function testItOnlyEverReturnsWithinPlMail(string $return): void
+    {
+        $this->signIn();
+
+        $this->client->request('POST', '/calendar/sets', ['_token' => $this->token(), 'name' => 'Work', 'return' => $return]);
 
         self::assertResponseRedirects('/calendar', 303);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function foreignReturns(): iterable
+    {
+        yield 'scheme-relative' => ['//evil.example/'];
+        yield 'backslash'       => ['/\\evil.example/'];
+        yield 'tab'             => ["/\t/evil.example/"];
+        yield 'absolute'        => ['https://evil.example/'];
     }
 
     public function testAnotherPersonsCalendarCannotBeToggled(): void
@@ -140,14 +171,31 @@ final class CalendarSetsTest extends WebTestCase
         self::assertResponseStatusCodeSame(403);
     }
 
-    public function testEveryActionNeedsTheToken(): void
+    #[DataProvider('actions')]
+    public function testEveryActionNeedsTheToken(string $action): void
     {
         $this->signIn();
+        $this->save('Work');
+        $this->post('toggle', 'Gym');
+        $before = [$this->sets(), $this->visibility()];
 
-        $this->client->request('POST', '/calendar/sets', ['_token' => 'nope', 'name' => 'Work']);
+        $url = match ($action) {
+            'create' => '/calendar/sets',
+            'toggle' => "/calendar/sets/calendar/{$this->ids['Gym']}/toggle",
+            default  => "/calendar/sets/{$this->sets()[0]->id}/{$action}",
+        };
+        $this->client->request('POST', $url, ['_token' => 'nope', 'name' => 'Changed']);
 
         self::assertResponseStatusCodeSame(403);
-        self::assertSame([], $this->sets());
+        self::assertEquals($before, [$this->sets(), $this->visibility()]);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function actions(): iterable
+    {
+        foreach (['create', 'apply', 'update', 'rename', 'delete', 'toggle'] as $action) {
+            yield $action => [$action];
+        }
     }
 
     // ── fixture ───────────────────────────────────────────────────────────

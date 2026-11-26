@@ -19,7 +19,7 @@ picked from the calendar toolbar's sets menu (calendar/_sets_menu.html.twig).
                            maxlength="{{ constant('App\\Service\\Calendar\\CalendarSets::MAX_NAME_LENGTH') }}"
                            aria-label="{{ 'settings.calendar_sets.rename'|trans({'%name%': set.name}) }}"
                            class="flex-1 min-w-0 h-8 px-2 rounded-lg text-sm bg-transparent border border-transparent hover:border-line focus:border-accent text-ink focus:outline-none">
-                    <span class="text-[10px] text-ink-faint whitespace-nowrap">{{ 'settings.calendar_sets.count'|trans({'%count%': set.calendarIds|length}) }}</span>
+                    <span class="text-[10px] text-ink-faint whitespace-nowrap">{{ 'settings.calendar_sets.count'|trans({'%count%': menu.sizes[set.id]}) }}</span>
                     <button type="submit"
                             class="w-8 h-8 flex items-center justify-center rounded-lg text-ink-faint hover:text-ink hover:bg-hover transition-colors cursor-pointer"
                             title="{{ 'settings.calendar_sets.save_name'|trans }}"

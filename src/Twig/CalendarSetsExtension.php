@@ -35,6 +35,7 @@ final class CalendarSetsExtension extends AbstractExtension
      *     sets: list<CalendarSet>,
      *     active: ?CalendarSet,
      *     last: ?CalendarSet,
+     *     sizes: array<string, int>,
      *     groups: array<string, list<Calendar>>,
      *     visible: list<Calendar>,
      *     total: int,
@@ -45,20 +46,27 @@ final class CalendarSetsExtension extends AbstractExtension
         $user = $this->security->getUser();
 
         if (false === $user instanceof User) {
-            return ['sets' => [], 'active' => null, 'last' => null, 'groups' => [], 'visible' => [], 'total' => 0];
+            return ['sets' => [], 'active' => null, 'last' => null, 'sizes' => [], 'groups' => [], 'visible' => [], 'total' => 0];
         }
 
         $calendars = $this->calendars->all($user);
+        $sets      = $this->sets->all($user);
         $groups    = [];
+        $sizes     = [];
+
+        foreach ($sets as $set) {
+            $sizes[$set->id] = $this->sets->size($set, $calendars);
+        }
 
         foreach ($calendars as $calendar) {
             $groups[$this->source($calendar)][] = $calendar;
         }
 
         return [
-            'sets'    => $this->sets->all($user),
+            'sets'    => $sets,
             'active'  => $this->sets->active($user, $calendars),
             'last'    => $this->sets->last($user),
+            'sizes'   => $sizes,
             'groups'  => $groups,
             'visible' => $this->calendars->visible($user),
             'total'   => count($calendars),
