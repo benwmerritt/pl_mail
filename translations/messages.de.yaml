@@ -3140,6 +3140,8 @@ label:
     menu:
         create: Neu erstellen
         empty: Noch keine Labels.
+        filter: "Zum Filtern tippen"
+        no_match: "Nichts passt."
     updated: Label aktualisiert.
     visibility:
         hidden: Label ist jetzt ausgeblendet.

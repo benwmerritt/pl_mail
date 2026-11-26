@@ -3136,6 +3136,8 @@ label:
     menu:
         create: Create new
         empty: No labels yet.
+        filter: "Type to filter"
+        no_match: "Nothing matches."
     updated: Label updated.
     visibility:
         hidden: Label is now hidden.
