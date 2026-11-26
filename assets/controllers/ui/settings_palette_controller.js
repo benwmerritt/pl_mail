@@ -234,7 +234,7 @@ export default class extends Controller {
 
         const add = (link, crumb, parents = []) => {
             const url = new URL(link.getAttribute("href"), window.location.href);
-            const title = (link.getAttribute("title") || this.#text(link)).replace(/\s+/g, " ").trim();
+            const title = (this.#title(link) || this.#text(link)).replace(/\s+/g, " ").trim();
 
             if ("" === title || seen.has(url.href)) {
                 return;
@@ -263,12 +263,17 @@ export default class extends Controller {
         const account = link.closest("[data-settings--account-expand-account-value]")?.querySelector(PLACES);
 
         if (account instanceof HTMLElement && account !== link) {
-            return account.getAttribute("title") ?? "";
+            return this.#title(account);
         }
 
         return link.closest("details.group\\/section")?.querySelector("summary")?.getAttribute("aria-label")
             ?? this.messagesValue.place
             ?? "";
+    }
+
+    /** A link's title, which ui--tooltip moves to data-tooltip once the link is hovered. */
+    #title(link) {
+        return link.getAttribute("title") || link.dataset.tooltip || "";
     }
 
     /** The labels a nested one sits in, outermost first. */
