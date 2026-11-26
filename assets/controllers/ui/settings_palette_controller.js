@@ -36,9 +36,8 @@ import { flashCard, matchingKeyword, normalise } from "../../settings_search.js"
  *
  * Ranked by where the words matched, best first: the start of a title, then
  * anywhere in a title, then the area or page it sits in, then a keyword. A
- * stable sort within each rank keeps the order above — commands, places,
- * then the tree's own — so equal matches come
- * out the way Settings lists them.
+ * stable sort within each rank keeps the order above (commands, places, then
+ * the tree's own), so equal matches come out the way Settings lists them.
  *
  * ## When ⌘K is not ours
  *
