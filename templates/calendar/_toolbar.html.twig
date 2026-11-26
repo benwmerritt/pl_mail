@@ -15,7 +15,7 @@ calendar has no ends, so it never does.
 {% set paneQuery = compact ? '?pane=1' : '' %}
 
 {# Agenda steps a day at a time like day view: it is a rolling list, not a page. #}
-{% set step = view.value == 'month' ? '1 month' : (view.value == 'week' ? '7 days' : '1 day') %}
+{% set step = {month: '1 month', week: '7 days', '3days': '3 days'}[view.value] ?? '1 day' %}
 
 {% set viewUrls = {} %}
 {% for candidate in enum('App\\Domain\\Enum\\Calendar\\CalendarView').cases() %}
@@ -49,6 +49,12 @@ calendar has no ends, so it never does.
     frame:     frame|default(null),
 } %}
     {% block toolbar_actions %}
+        {# The view's own URL, not the request's: the pane's first draw is a
+           sub-request whose URI is an internal fragment. #}
+        {% include 'calendar/_sets_menu.html.twig' with {
+            returnUrl: path('app_calendar_view', { view: view.value, date: anchor|date('Y-m-d') }) ~ paneQuery,
+        } only %}
+
         {# `data-calendar-new-event`: on a narrow month the day chosen under the
            grid is put in this button's URL, so it adds to that day, as the
            list's own + does (calendar/month_tap_controller.js). #}

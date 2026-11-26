@@ -45,7 +45,7 @@ import { liftAbove, visible } from "../../place_above.js";
  */
 export default class extends Controller {
     static targets = ["menu"];
-    static values = { place: String };
+    static values = { place: String, open: Boolean };
 
     connect() {
         this._boundOutside = this._handleOutside.bind(this);
@@ -63,6 +63,10 @@ export default class extends Controller {
         // is pinned.
         if (this.hasMenuTarget && false === this.menuTarget.hasAttribute("data-enter")) {
             this.menuTarget.setAttribute("data-enter", "slide-down");
+        }
+
+        if (this.openValue) {
+            this.open();
         }
     }
 

@@ -85,17 +85,19 @@ Blocks:
 {% set compact = compact|default(false) %}
 {% set frame = frame|default(null) %}
 {% set labelKeys = labelKeys|default({}) %}
-{% set spanLabel = spanLabel|default(view.value == 'week') %}
+{% set spanLabel = spanLabel|default(view.value in ['3days', 'week']) %}
 
+{# The two spans of days read as their count, so 3 and 7 sit side by side as
+   the toggle they are. #}
+{% set viewDigits = {'3days': '3', week: '7'} %}
 {% set viewIcons = {
     day:    'fa-calendar-day',
-    week:   'fa-calendar-week',
     month:  'fa-calendar-days',
     agenda: 'fa-list-ul',
 } %}
 
 <div class="@container/toolbar border-b border-line shrink-0">
-<div class="pane-header flex items-center gap-2 px-3 @max-[37rem]/toolbar:gap-1 @max-[37rem]/toolbar:px-2 @max-[22rem]/toolbar:px-1">
+<div class="pane-header flex flex-wrap items-center gap-x-2 gap-y-1 px-3 @max-[37rem]/toolbar:gap-1 @max-[37rem]/toolbar:px-2 @max-[22rem]/toolbar:px-1">
     <div class="flex items-center gap-0.5 shrink-0">
         {% if prevUrl is not null %}
             <a href="{{ prevUrl }}"
@@ -295,11 +297,19 @@ Blocks:
                                   : 'text-ink-muted hover:bg-hover hover:text-ink focus-visible:ring-accent' }}"
                     >
                         {%- if compact -%}
-                            <i class="fa-solid {{ viewIcons[candidate.value] }}" aria-hidden="true"></i>
+                            {%- if viewDigits[candidate.value] is defined -%}
+                                <span class="font-semibold tabular-nums" aria-hidden="true">{{ viewDigits[candidate.value] }}</span>
+                            {%- else -%}
+                                <i class="fa-solid {{ viewIcons[candidate.value] }}" aria-hidden="true"></i>
+                            {%- endif -%}
                         {%- else -%}
                             {#- Words, or on a narrow row the pane's icon with
                                 the word kept for screen readers. -#}
-                            <i class="fa-solid {{ viewIcons[candidate.value] }} hidden @max-[37rem]/toolbar:inline" aria-hidden="true"></i>
+                            {%- if viewDigits[candidate.value] is defined -%}
+                                <span class="font-semibold tabular-nums hidden @max-[37rem]/toolbar:inline" aria-hidden="true">{{ viewDigits[candidate.value] }}</span>
+                            {%- else -%}
+                                <i class="fa-solid {{ viewIcons[candidate.value] }} hidden @max-[37rem]/toolbar:inline" aria-hidden="true"></i>
+                            {%- endif -%}
                             <span class="@max-[37rem]/toolbar:sr-only">{{ label }}</span>
                         {%- endif -%}
                     </a>

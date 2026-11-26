@@ -83,6 +83,25 @@ final class CalendarViewMemoryTest extends WebTestCase
         self::assertSame(CalendarView::Day, $this->stored()->calendarPaneView, 'the pane kept its own');
     }
 
+    /** The pane toggles between three days and seven, and remembers which. */
+    public function testThePaneDrawsThreeDaysAndRemembersIt(): void
+    {
+        $client = $this->signIn();
+
+        $crawler = $client->request('GET', '/calendar/3days/2026-11-27?pane=1');
+
+        self::assertResponseIsSuccessful();
+        self::assertSame(['2026-11-27', '2026-11-28', '2026-11-29'], $crawler->filter('[data-day]')->each(
+            static fn ($column): string => (string) $column->attr('data-day'),
+        ));
+        self::assertSame(CalendarView::ThreeDays, $this->stored()->calendarPaneView);
+        self::assertCount(
+            1,
+            $crawler->filter('a[href="/calendar/3days/2026-11-30?pane=1"]'),
+            'the next step is three days on',
+        );
+    }
+
     /**
      * A value the settings bag cannot make sense of opens on the default rather
      * than failing to render.

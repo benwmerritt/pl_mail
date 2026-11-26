@@ -179,7 +179,7 @@ Variables:
                            token: token, view: range.view.value, date: range.today,
                        }),
             viewUrls:  viewUrls,
-            spanLabel: range.view.value == 'week' or range.view.value == 'agenda',
+            spanLabel: range.view.value in ['3days', 'week', 'agenda'],
             labelKeys: {week: 'calendar.view.monday_week'},
         } %}{% endembed %}
 
