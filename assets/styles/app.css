@@ -6721,12 +6721,14 @@ li[data-swipe-side] > [data-swipe-content] {
 
 /* ═══ Inbox zero (BMAIL-15) ═════════════════════════════════════════════════
    mail/_inbox_zero.html.twig is drawn after the rows whether or not there are
-   any, and shows only once no row stands in front of it. A row hidden by
+   any, and shows only once the list holds no row. A row hidden by
    optimistic_rows.js is on its way out, so it does not count: archiving the
    last row shows the picture at once, and putting the row back after a failed
-   request hides it again, with no script involved either way.
+   request hides it again, with no script involved either way. Asked of the
+   whole list rather than the rows before the picture, because pinning moves a
+   lone row to the end (pin.js placeRow()).
    ═══════════════════════════════════════════════════════════════════════════ */
-li[data-controller~="mail--message-row"]:not([hidden]) ~ .inbox-zero {
+:has(> li[data-controller~="mail--message-row"]:not([hidden])) > .inbox-zero {
     display: none;
 }
 
