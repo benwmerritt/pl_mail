@@ -16,7 +16,7 @@ inRelations (ones pointing at it), refEmails (ReferenceEmailFinder rows).
         <a href="{{ path('app_contacts_list') }}" class="{{ iconBtn }}" title="{{ 'contacts.back'|trans }}">
             <i class="fa-solid fa-arrow-left text-sm" aria-hidden="true"></i>
         </a>
-        <h1 class="text-base font-semibold text-ink flex-1 min-w-0 truncate">{{ contact.displayName }}</h1>
+        <h1 class="text-base font-semibold text-ink flex-1 min-w-0 truncate">{{ 'contacts.title'|trans }}</h1>
         {% if contact.editable %}
             <a href="{{ path('app_contacts_edit', { id: contact.id }) }}" class="{{ btnGhost }}">
                 <i class="fa-solid fa-pen text-xs" aria-hidden="true"></i>{{ 'contacts.edit'|trans }}
@@ -43,7 +43,7 @@ inRelations (ones pointing at it), refEmails (ReferenceEmailFinder rows).
                             <p class="text-xs text-ink-faint truncate">{{ phonetic }}</p>
                         {% endif %}
                         {% if contact.jobTitle or contact.company or contact.department %}
-                            <p class="text-sm text-ink-muted truncate">
+                            <p class="text-sm text-ink-muted">
                                 {{- [contact.jobTitle, contact.department, contact.company]|filter(v => v)|join(' · ') -}}
                             </p>
                         {% endif %}

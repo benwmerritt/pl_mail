@@ -160,6 +160,16 @@ Variables:
                         {{ 'message.draft'|trans }}
                     </span>
                 {% endif %}
+                {# In the address book, or one click to put them there. Beside the name, so a wrapped address never
+                   leaves it alone on a line. #}
+                {% if message.fromAddress %}
+                    {% include 'contacts/_sender_badge.html.twig' with {
+                        address: message.fromAddress,
+                        name: message.fromName,
+                        contactId: address_book_contact_id(message.fromAddress),
+                    } only %}
+                {% endif %}
+
                 {# The address is the one half of this line the sender cannot
                    choose, so it is as readable as the name beside it: same
                    size, full ink, and allowed to WRAP — `truncate` cuts the
@@ -167,15 +177,6 @@ Variables:
                    for things that are meant to be overlooked. #}
                 {% if message.fromName %}
                     <span class="text-sm text-ink break-all">&lt;{{ message.fromAddress }}&gt;</span>
-                {% endif %}
-
-                {# In the address book, or one click to put them there. #}
-                {% if message.fromAddress %}
-                    {% include 'contacts/_sender_badge.html.twig' with {
-                        address: message.fromAddress,
-                        name: message.fromName,
-                        contactId: address_book_contact_id(message.fromAddress),
-                    } only %}
                 {% endif %}
 
                 {# The labels on THIS message, not on the thread. A rule that
