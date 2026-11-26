@@ -70,7 +70,9 @@ const TAB_LINKS = "a[data-category-tab-link]";
  * a listener of their own that leaves no mark on the event, added when they
  * open and so run after this one, so they have to be asked rather than heard
  * from. Named one by one because a target name is not enough — the search bar
- * is a "panel" too, and always on screen.
+ * is a "panel" too, and always on screen. A message's own menu and its
+ * recipient details are left out: neither closes on Escape, and both live in
+ * the conversation, so going back puts them away with it.
  */
 const CLOSES_ON_ESCAPE = [
     "[data-ui--dropdown-target~='menu']",
@@ -78,8 +80,6 @@ const CLOSES_ON_ESCAPE = [
     "[data-mail--label-menu-target~='panel']",
     "[data-mail--move-menu-target~='panel']",
     "[data-mail--spam-menu-target~='panel']",
-    "[data-mail--message-actions-target~='panel']",
-    "[data-mail--message-details-target~='panel']",
     "[data-mail--action-sheet-target~='panel']",
     "[data-mail--search-target~='dropdown']",
 ].join(", ");
