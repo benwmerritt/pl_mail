@@ -41,7 +41,7 @@ targets, so every message from this sender is updated at once.
     {% set twentyUrl = twenty_person_url(address) %}
     {% if twentyUrl %}
         <a href="{{ twentyUrl }}"
-           target="_blank" rel="noopener"
+           target="_blank" rel="noopener noreferrer"
            data-twenty-link
            title="{{ 'contacts.open_in_twenty'|trans }}"
            aria-label="{{ 'contacts.open_in_twenty'|trans }}"

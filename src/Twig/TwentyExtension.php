@@ -12,16 +12,14 @@ use Twig\TwigFunction;
  * `twenty_person_url()` — where an address's person is in the Twenty CRM named by TWENTY_URL.
  *
  * The link is Twenty's People list filtered to the address, which Twenty
- * builds from the URL, so plMail needs no key and makes no request: it lands
- * on the one person with that address, or on an empty list to add them from.
+ * builds from the URL, so plMail needs no key and makes no request.
  */
 final class TwentyExtension extends AbstractExtension
 {
     public function __construct(
         #[Autowire('%env(default::TWENTY_URL)%')]
         private readonly ?string $twentyUrl,
-    ) {
-    }
+    ) {}
 
     public function getFunctions(): array
     {
