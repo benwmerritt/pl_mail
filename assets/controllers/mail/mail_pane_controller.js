@@ -195,7 +195,7 @@ const TOOLBAR = "[data-controller~='mail--list-toolbar']";
 
 export default class extends Controller {
     static targets = ["list", "reading"];
-    static values = { open: Boolean , mailBoxId: Number, inboxUrl: String };
+    static values = { open: Boolean , mailBoxId: Number, inboxUrl: String, advance: { type: String, default: "list" } };
 
     connect() {
         this._listUrl = this.openValue ? null : window.location.href;
@@ -473,6 +473,33 @@ export default class extends Controller {
         history.back();
     }
 
+    /**
+     * What to do once the open conversation has left the list: the reader's
+     * auto-advance choice (App\Domain\Enum\Mail\AutoAdvance), as a function to
+     * call after the write succeeds.
+     *
+     * Asked BEFORE the write, because its answer is a turbo-stream that takes
+     * the open row out of the list, and with it the only way to tell which row
+     * was beside it. Nothing beside it — the end of the list, or a message
+     * opened from somewhere the list does not show — closes, as always.
+     *
+     * @returns {() => Promise<void>}
+     */
+    leaving() {
+        const next = this._besideOpenRow();
+
+        if (null === next) {
+            return async () => this.close();
+        }
+
+        // Replaced rather than pushed: the conversation that left is not
+        // somewhere Back should return to.
+        return async () => {
+            await this._loadMessage(next);
+            history.replaceState({ mailPaneOpen: true }, "", next);
+        };
+    }
+
     async _handlePopState(event) {
         const state = event.state;
 
@@ -609,6 +636,25 @@ export default class extends Controller {
 
         row.dataset.selected = "true";
         row.setAttribute("aria-current", "true");
+    }
+
+    /**
+     * The address of the row below or above the open one, as the reader chose,
+     * or null for "back to the list" and for a row with nothing on that side.
+     * See leaving().
+     */
+    _besideOpenRow() {
+        const step = { next: 1, previous: -1 }[this.advanceValue];
+
+        if (undefined === step) {
+            return null;
+        }
+
+        const rows = [...this.listTarget.querySelectorAll(`${ROW}:not([hidden]):not([data-leaving])`)];
+        const at = rows.findIndex((row) => row.hasAttribute("data-selected"));
+        const link = -1 === at ? null : rows[at + step]?.querySelector(':scope > a[data-action~="click->mail--mail-pane#open"]');
+
+        return link?.href ?? null;
     }
 
     /** Tells the layout a message is open, so the placeholder beside the list stands down. */
