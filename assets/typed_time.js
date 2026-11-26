@@ -24,10 +24,10 @@
  *   3pm, 15:30, 9.45, 15 uhr, 15h30    today if still to come, else tomorrow
  *
  * and any of the day words with one of the times around it ("tomorrow 9:30",
- * "fri noon", "2 days at 3pm", "Montag morgen", "15:30 am Freitag"). A time
- * from 1 to 7:59 is the afternoon one: "3" means 15:00, as it does when said
- * aloud, and nobody snoozes to 3am by typing one digit. "am", "pm", "uhr" or a
- * leading zero ("07:30") say exactly which. "2h" is two hours; "15h" is 15:00,
+ * "fri noon", "2 days at 3pm", "Montag morgen", "15:30 am Freitag"). A bare
+ * hour from 1 to 7 is the afternoon one: "3" means 15:00, as it does when said
+ * aloud, and nobody snoozes to 3am by typing one digit. Minutes ("6:30"),
+ * "am", "pm", "uhr" or a leading zero ("07") say exactly which. "2h" is two hours; "15h" is 15:00,
  * as French and German write it, since nobody means fifteen hours that way.
  */
 
@@ -211,7 +211,7 @@ function takeTime(words) {
             }
 
             hour = hour % 12 + ("pm" === marker || "p" === marker ? 12 : 0);
-        } else if (null === marker && hour >= 1 && hour <= 7 && false === match[1].startsWith("0")) {
+        } else if (null === marker && undefined === match[2] && hour >= 1 && hour <= 7 && false === match[1].startsWith("0")) {
             hour += 12;
         }
 

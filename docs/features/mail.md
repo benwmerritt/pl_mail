@@ -1167,10 +1167,10 @@ is.
 
 Or type the time into the field at the top of the menu: *tue 3pm*, *2 days*, *next month*, *tomorrow
 9:30*, *in 3 hours*, or the same in German, *di 15 Uhr*, *2 Tage*, *morgen früh*. The time it was
-read as appears under the field, and **Enter** snoozes to it. A day without a time is 08:00, an
-hour from 1 to 7 is the afternoon one unless written with a leading zero (*07:30*), *15h* and
-*15h30* are clock times, and a weekday is the next one after today. With a keyboard the field has
-the focus as the menu opens, so **b** and the time is all it takes.
+read as appears under the field, and **Enter** snoozes to it. A day without a time is 08:00, a bare
+hour from 1 to 7 is the afternoon one (*3* is 15:00, *3:00* is 03:00), *15h* and *15h30* are clock
+times, and a weekday is the next one after today. With a keyboard the field has the focus as the
+menu opens, so **b** and the time is all it takes.
 
 `app:mail:wake-snoozed` runs every minute and is what brings conversations back. A woken
 conversation is marked **unread** — that is the point of the feature, since a thread returning in
