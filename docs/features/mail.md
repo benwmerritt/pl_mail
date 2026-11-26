@@ -1064,9 +1064,9 @@ the conversation you are reading takes you back to the list. **Settings → Gene
 controls → Auto-advance** can open the one below it in the list instead, or the one above, so `e`
 works through a mailbox without going back each time. It works the same with one pane or two, from a
 button or a key. At the end of the list, or for a message opened from somewhere the list does not
-show it, you go back to the list as before. Mark as unread always goes back, because the
-conversation is still in the list. Back in the browser skips the conversation that left and goes to
-the list.
+show it, you go back to the list as before. So does archiving one email of a conversation, and
+Mark as unread, because the conversation is still in the list. Back in the browser skips the
+conversation that left.
 
 ## Who a message is from
 

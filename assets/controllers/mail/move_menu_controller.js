@@ -58,7 +58,7 @@ export default class extends LabelMenuController {
         }
 
         const view = this.#view();
-        const leave = this.#pane()?.leaving();
+        const leave = this.#pane()?.leaving({ type: this.targetTypeValue, id: this.targetIdValue });
 
         let response;
 

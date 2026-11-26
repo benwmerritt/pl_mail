@@ -140,7 +140,7 @@ export default class extends Controller {
         const { until = null } = event.params;
         event.stopPropagation();
 
-        const leave = this._pane()?.leaving();
+        const leave = this._pane()?.leaving(this._subject());
 
         if (false === await this._post(this._url("snooze"), { until })) {
             return;
@@ -155,7 +155,7 @@ export default class extends Controller {
         event.stopPropagation();
         this._close();
 
-        const leave = this._pane()?.leaving();
+        const leave = this._pane()?.leaving(this._subject());
 
         if (false === await this._post(this._url("archive"))) {
             return;
@@ -168,7 +168,7 @@ export default class extends Controller {
         event.stopPropagation();
         this._close();
 
-        const leave = this._pane()?.leaving();
+        const leave = this._pane()?.leaving(this._subject());
 
         if (false === await this._post(this._url("trash"))) {
             return;
@@ -182,13 +182,11 @@ export default class extends Controller {
         event.stopPropagation();
         this._close();
 
-        const leave = this._pane()?.leaving();
-
         if (false === await this._post(this._url("restore"))) {
             return;
         }
 
-        await leave?.();
+        this._pane()?.close();
     }
 
     /**
@@ -204,7 +202,7 @@ export default class extends Controller {
             return;
         }
 
-        const leave = this._pane()?.leaving();
+        const leave = this._pane()?.leaving(this._subject());
 
         if (false === await this._post(this._url("purge"))) {
             return;
@@ -268,6 +266,11 @@ export default class extends Controller {
         announceWrite();
 
         return true;
+    }
+
+    /** What this toolbar writes to, as mail--mail-pane#leaving asks. */
+    _subject() {
+        return { type: this.entityTypeValue, id: this.entityIdValue };
     }
 
     /** mail-pane lives on <body> (see _layout/app.html.twig). */
