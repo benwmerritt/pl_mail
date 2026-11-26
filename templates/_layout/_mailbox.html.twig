@@ -371,7 +371,6 @@ csrf token. Both measured: see App\Twig\ListFragmentGlobal.
                         </div>
                         {{ block('list_frame') }}
 
-                        {# Below md the sidebar is a drawer, and its Compose with it. #}
                         {% if app.user %}
                             <a href="{{ path('app_compose_new') }}"
                                data-turbo-frame="compose_dock"

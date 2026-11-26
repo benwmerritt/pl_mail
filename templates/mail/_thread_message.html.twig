@@ -160,8 +160,7 @@ Variables:
                         {{ 'message.draft'|trans }}
                     </span>
                 {% endif %}
-                {# In the address book, or one click to put them there. Beside the name, so a wrapped address never
-                   leaves it alone on a line. #}
+                {# In the address book, or one click to put them there. #}
                 {% if message.fromAddress %}
                     {% include 'contacts/_sender_badge.html.twig' with {
                         address: message.fromAddress,

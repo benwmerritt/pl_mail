@@ -30,7 +30,6 @@
             data-action="click->settings--appearance#pickTheme"
             class="group flex flex-col items-center gap-2 p-2 rounded-pane cursor-pointer hover:bg-hover transition-colors
                    {{ selected ? 'ring-2 ring-accent' : '' }}">
-        {# System follows the device, so its tile is both halves: Light's sheet and Dark's. #}
         {% set dark = enum('App\\Domain\\Enum\\Theme\\Theme').Dark.swatch %}
         <span class="w-full h-10 rounded-lg border border-line flex items-end p-1 gap-1"
               style="background:{{ 'system' == theme.value ? 'linear-gradient(135deg, ' ~ swatch[0] ~ ' 50%, ' ~ dark[0] ~ ' 50%)' : swatch[0] }}">
