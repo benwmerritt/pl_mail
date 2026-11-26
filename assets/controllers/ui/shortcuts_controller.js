@@ -293,14 +293,19 @@ export default class extends Controller {
         this._onCommands = (event) => {
             event.detail.commands = COMMANDS.filter((command) => this.#runnable(command));
         };
-        this._onRun = (event) => event.detail.keys.forEach((key) => this.#handle({
-            key,
-            shiftKey: /^[A-Z]$/.test(key),
-            target: document.body,
-            defaultPrevented: false,
-            isComposing: false,
-            preventDefault() {},
-        }));
+        // A `g` or `*` pressed just before ⌘K would otherwise take the
+        // command's first key as its second.
+        this._onRun = (event) => {
+            this.#clearPrefix();
+            event.detail.keys.forEach((key) => this.#handle({
+                key,
+                shiftKey: /^[A-Z]$/.test(key),
+                target: document.body,
+                defaultPrevented: false,
+                isComposing: false,
+                preventDefault() {},
+            }));
+        };
         this._onFocusIn = (event) => this.#focusIn(event.target);
         this._onFocusOut = (event) => this.#focusOut(event.target);
 
@@ -547,11 +552,32 @@ export default class extends Controller {
     /** Whether one of COMMANDS would do something if it were pressed now. */
     #runnable(command) {
         const [key, second] = command.split(" ");
-        const target = "*" === key
-            ? (true === this.#listShowing() ? document.querySelector(`[data-action='click->mail--list-toolbar#${SELECT[second]}']`) : null)
-            : this.#button(key);
+        const target = this.#commandTarget(key, second);
 
         return null !== target && true !== target.disabled;
+    }
+
+    /**
+     * #button(), narrowed to what a named command may claim: `a` only where
+     * there is a Reply all to press, since the box offers Reply beside it,
+     * and `/` only where the field can be seen (a phone hides it).
+     */
+    #commandTarget(key, second) {
+        if ("*" === key) {
+            return true === this.#listShowing() ? document.querySelector(`[data-action='click->mail--list-toolbar#${SELECT[second]}']`) : null;
+        }
+
+        if ("a" === key) {
+            return this.#reading()?.querySelector(OPEN.replyAll) ?? null;
+        }
+
+        const target = this.#button(key);
+
+        if ("/" === key && false === target?.checkVisibility?.()) {
+            return null;
+        }
+
+        return target;
     }
 
     /** The key after `g` or `*`. */

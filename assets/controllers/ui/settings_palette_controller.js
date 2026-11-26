@@ -75,6 +75,8 @@ const LIMIT = 12;
 /** Every link in the sidebar, in the desktop rail and the phone's drawer alike. */
 const PLACES = "[data-ui--sidebar-target~='link'][href]";
 
+const TABS = "a[data-category-tab-link]";
+
 /** How a key is shown: `e`, and Shift for a capital, as the tooltips show it. */
 function keyName(key) {
     return /^[A-Z]$/.test(key) ? `Shift+${key}` : key;
@@ -90,6 +92,7 @@ export default class extends Controller {
     static targets = ["input", "status", "list", "row", "key"];
 
     #entries = null;
+    #failed = false;
     #here = [];
     #shown = [];
     #selected = 0;
@@ -110,14 +113,18 @@ export default class extends Controller {
     async open() {
         this.#here = [...this.#commands(), ...this.#places()].map((entry) => this.#prepare(entry));
         this.inputTarget.value = "";
-        this.statusTarget.textContent = "";
+        this.#failed = false;
         this.element.showModal();
         this.inputTarget.focus();
         this.search();
 
         if (null === this.#entries) {
             await this.#load();
-            this.search();
+
+            // Whatever was typed or picked while they loaded stays picked.
+            if (true === this.element.open) {
+                this.#show(this.#shown[this.#selected]);
+            }
         }
     }
 
@@ -127,16 +134,7 @@ export default class extends Controller {
     }
 
     search() {
-        const query = normalise(this.inputTarget.value.trim());
-        const all = [...this.#here, ...(this.#entries ?? [])];
-
-        // Before anything is typed: the commands, the places a key goes to, and
-        // the settings pages — what a hand would reach for, not every label.
-        this.#shown = "" === query
-            ? all.filter((entry) => entry.page || (entry.keys ?? []).length > 0)
-            : this.#rank(all, query).slice(0, LIMIT);
-        this.#selected = 0;
-        this.#render(query);
+        this.#show(undefined);
     }
 
     navigate(event) {
@@ -167,6 +165,20 @@ export default class extends Controller {
 
     // ── Private ─────────────────────────────────────────────────────────────
 
+    /** Filters for what is typed, selecting `keep` where it is still listed, else the best match. */
+    #show(keep) {
+        const query = normalise(this.inputTarget.value.trim());
+        const all = [...this.#here, ...(this.#entries ?? [])];
+
+        // Before anything is typed: the commands, the places a key goes to, and
+        // the settings pages — what a hand would reach for, not every label.
+        this.#shown = "" === query
+            ? all.filter((entry) => entry.page || (entry.keys ?? []).length > 0)
+            : this.#rank(all, query).slice(0, LIMIT);
+        this.#render(query);
+        this.#select(Math.max(0, this.#shown.findIndex((entry) => entry.title === keep?.title && entry.crumb === keep?.crumb)));
+    }
+
     async #load() {
         try {
             const response = await fetch(this.urlValue, { headers: { Accept: "application/json" } });
@@ -181,7 +193,7 @@ export default class extends Controller {
         } catch {
             // Left null, so the next open asks again rather than searching an
             // empty list and saying "nothing found" about every setting.
-            this.statusTarget.textContent = this.messagesValue.failed ?? "";
+            this.#failed = true;
         }
     }
 
@@ -210,7 +222,8 @@ export default class extends Controller {
      * The sidebar's links and the inbox's tabs. A link is named by its title
      * where it has one (an account, by its address), and otherwise by its
      * text without the counts and new-mail dots the sidebar patches into it;
-     * each place once, though the rail and the drawer both draw it.
+     * each place once, though the rail and the drawer both draw it. An
+     * account's folders sit under its address, as every account has an Inbox.
      */
     #places() {
         const go = this.#goKeys();
@@ -227,18 +240,27 @@ export default class extends Controller {
 
             seen.add(url.href);
 
-            const key = "" === url.search ? go[url.pathname] : undefined;
+            const key = ("" === url.search ? go[url.pathname] : undefined) ?? go[link.dataset.alsoOpenAt];
 
             places.push({ title, crumb, terms: "", url: url.href, keys: undefined === key ? [] : ["g", key] });
         };
 
-        document.querySelectorAll(PLACES).forEach((link) => add(
-            link,
-            link.closest("details.group\\/section")?.querySelector("summary")?.getAttribute("aria-label") ?? this.messagesValue.place ?? "",
-        ));
-        document.querySelectorAll("a[data-category-tab-link]").forEach((link) => add(link, this.messagesValue.tab ?? ""));
+        document.querySelectorAll(PLACES).forEach((link) => add(link, this.#crumb(link)));
+        document.querySelectorAll(TABS).forEach((link) => add(link, this.messagesValue.tab ?? ""));
 
         return places;
+    }
+
+    #crumb(link) {
+        const account = link.closest("[data-settings--account-expand-account-value]")?.querySelector(PLACES);
+
+        if (account instanceof HTMLElement && account !== link) {
+            return account.getAttribute("title") ?? "";
+        }
+
+        return link.closest("details.group\\/section")?.querySelector("summary")?.getAttribute("aria-label")
+            ?? this.messagesValue.place
+            ?? "";
     }
 
     #text(link) {
@@ -311,15 +333,23 @@ export default class extends Controller {
 
         this.listTarget.replaceChildren(...rows);
 
-        this.statusTarget.textContent = "" === query
-            ? (null === this.#entries ? this.statusTarget.textContent : "")
-            : (0 === rows.length ? this.messagesValue.empty : this.messagesValue.count.replace("%count%", String(rows.length)));
-
-        this.#select(0);
+        // A failed load says so over "nothing found": the settings were not
+        // searched, so nothing is not what was found.
+        if (true === this.#failed && ("" === query || 0 === rows.length)) {
+            this.statusTarget.textContent = this.messagesValue.failed ?? "";
+        } else {
+            this.statusTarget.textContent = "" === query
+                ? ""
+                : (0 === rows.length ? this.messagesValue.empty : this.messagesValue.count.replace("%count%", String(rows.length)));
+        }
     }
 
     #select(index) {
         this.#selected = index;
+
+        if (0 === this.#shown.length) {
+            this.inputTarget.removeAttribute("aria-activedescendant");
+        }
 
         this.listTarget.querySelectorAll("[role='option']").forEach((row, at) => {
             row.setAttribute("aria-selected", at === index ? "true" : "false");
@@ -337,6 +367,18 @@ export default class extends Controller {
         // After the close: a key is not pressed while a dialog is open.
         if (undefined !== entry.run) {
             document.dispatchEvent(new CustomEvent("ui--shortcuts:run", { detail: { keys: entry.run } }));
+
+            return;
+        }
+
+        // A place opens by its own link where one can be pressed, the way the
+        // sidebar opens it: into the list's frame where the link says so. The
+        // phone's drawer is inert while shut, and the rail is hidden there.
+        const link = [...document.querySelectorAll(`${PLACES}, ${TABS}`)]
+            .find((candidate) => candidate.href === entry.url && null === candidate.closest("[inert]") && false !== candidate.checkVisibility?.());
+
+        if (undefined !== link) {
+            link.click();
 
             return;
         }
