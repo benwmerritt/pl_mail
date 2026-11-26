@@ -1,4 +1,4 @@
-<!-- translated-from: features/mail.md sha1:b94441ef3d4edc01f613417db27dc11ca597165e -->
+<!-- translated-from: features/mail.md sha1:84736bae683fa910e73113a6732d71e494fb6f9a -->
 
 # Mail
 
@@ -1275,9 +1275,9 @@ früh“ sonst dort auflösen, wo der Container sich vermutet.
 Oder tipp die Zeit ins Feld oben im Menü: *di 15 Uhr*, *2 Tage*, *nächsten Monat*, *morgen 9:30*,
 *in 3 Stunden*, oder dasselbe auf Englisch, *tue 3pm*, *2 days*, *next month*. Wie die Zeit
 verstanden wurde, steht unter dem Feld, und **Enter** stellt bis dahin zurück. Ein Tag ohne Uhrzeit
-ist 08:00, eine einzelne Stunde von 1 bis 7 ist die am Nachmittag, und ein Wochentag ist der
-nächste nach heute. Mit Tastatur hat das Feld den Fokus, sobald das Menü aufgeht, also reichen
-**b** und die Zeit.
+ist 08:00, eine Stunde von 1 bis 7 ist die am Nachmittag, außer sie steht mit führender Null da
+(*07:30*), *15h* und *15h30* sind Uhrzeiten, und ein Wochentag ist der nächste nach heute. Mit
+Tastatur hat das Feld den Fokus, sobald das Menü aufgeht, also reichen **b** und die Zeit.
 
 `app:mail:wake-snoozed` läuft jede Minute und ist das, was Konversationen zurückbringt. Eine
 geweckte Konversation wird als **ungelesen** markiert — das ist der Sinn der Funktion, denn

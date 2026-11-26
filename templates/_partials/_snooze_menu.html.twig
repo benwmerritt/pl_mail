@@ -76,11 +76,11 @@
             hidden
             data-mail--snooze-menu-target="reading"
             {% if url %}data-{{ controller }}-snooze-url-param="{{ url }}"{% endif %}
-            data-action="{{ fire }}"
+            data-action="click->mail--snooze-menu#recheck {{ fire }}"
             {% if shared %}role="menuitem"{% endif %}
             class="w-full flex items-center justify-between gap-3 px-3 py-2 text-sm text-ink
                    hover:bg-hover transition-colors text-left">
-        <span data-snooze-when class="whitespace-nowrap tabular-nums"></span>
+        <span data-typed-when class="whitespace-nowrap tabular-nums"></span>
         <kbd class="shrink-0 rounded border border-line bg-raised px-1.5 font-mono text-[11px] text-ink-muted" aria-hidden="true">↵</kbd>
     </button>
     <p data-mail--snooze-menu-target="unread" hidden class="px-3 py-1.5 text-xs text-ink-faint"></p>

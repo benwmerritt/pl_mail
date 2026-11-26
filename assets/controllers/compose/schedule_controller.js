@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus";
 import { formatWallClock, instantOf, scheduleOptions, zoneHorizon, zoneNow } from "../../schedule_options.js";
 import { requestFailed } from "../../request_errors.js";
 import { csrfToken } from "../../csrf.js";
-import { formatTypedTime, readTypedTime } from "../../typed_time.js";
+import { readTypedTime } from "../../typed_time.js";
 
 /**
  * The send pill's chevron: send later.
@@ -124,7 +124,10 @@ export default class extends Controller {
     /** What has been typed so far, read: the option it names, or why there is none. */
     read() {
         const text    = this.typedTarget.value.trim();
-        const at      = "" === text ? null : readTypedTime(text, zoneNow(this.timezoneValue));
+        const read    = "" === text ? null : readTypedTime(text, (instant) => zoneNow(this.timezoneValue, instant));
+        // Through an instant and back, so a time the clocks skip ("02:30" the
+        // night they go forward) is shown, and sent, as the one it lands on.
+        const at      = null === read ? null : zoneNow(this.timezoneValue, new Date(this._instant(read)));
         const problem = null === at ? null : this._problem(at);
 
         const offered = null !== at && null === problem;
@@ -135,17 +138,22 @@ export default class extends Controller {
 
         if (true === offered) {
             this.readingTarget.dataset.scheduleAt = at;
-            this.readingTarget.querySelector("[data-schedule-when]").textContent = formatTypedTime(at, document.documentElement.lang || undefined);
+            this.readingTarget.querySelector("[data-typed-when]").textContent = formatWallClock(at, document.documentElement.lang || undefined, undefined, true);
         }
     }
 
-    /** Enter takes what was read. Left alone it would submit the form, which is Send. */
+    /**
+     * Enter takes what was read. Left alone it would submit the form, which is
+     * Send, and Ctrl/Cmd+Enter would reach compose's own send: every Enter
+     * stops here.
+     */
     take(event) {
         if ("Enter" !== event.key || event.isComposing) {
             return;
         }
 
         event.preventDefault();
+        event.stopPropagation();
 
         if (false === this.readingTarget.hidden) {
             this.readingTarget.click();
@@ -155,6 +163,24 @@ export default class extends Controller {
     /** A preset. The click sets the field; the submit is the button's own. */
     choose(event) {
         this._arm(event.currentTarget.dataset.scheduleAt ?? "");
+    }
+
+    /**
+     * The typed option, read again as it is taken: "today 5pm" left open past
+     * five, or "in 2 hours" sent a while after it was typed, is not what the
+     * option said when it was drawn. No longer a time to send at, the submit
+     * does not happen.
+     */
+    chooseTyped(event) {
+        this.read();
+
+        if (true === this.readingTarget.hidden) {
+            event.preventDefault();
+
+            return;
+        }
+
+        this._arm(this.readingTarget.dataset.scheduleAt ?? "");
     }
 
     /**

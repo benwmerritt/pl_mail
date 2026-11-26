@@ -4,9 +4,11 @@
  *
  * Read on the wall clock, the way both menus already count: the snooze menu on
  * the browser's clock (snooze_options.js), the send menu in the configured zone
- * (schedule_options.js). Each hands in its own "now" as "YYYY-MM-DDTHH:MM" and
- * gets the same spelling back, so the zone stays each menu's business and this
- * is calendar arithmetic only.
+ * (schedule_options.js). Each hands in its own clock, an instant to
+ * "YYYY-MM-DDTHH:MM", and gets the same spelling back, so the zone stays each
+ * menu's business. Days, weeks and months are counted on that wall clock;
+ * minutes and hours are elapsed time, so "in 2 hours" across a clock change is
+ * still two hours.
  *
  * English and German words are both read whatever the interface language,
  * since none of them means something else in the other: someone with a German
@@ -19,16 +21,15 @@
  *   today, tomorrow, übermorgen        that day, at 08:00
  *   tue, friday, next mon, am Freitag  the next one after today, at 08:00
  *   weekend, next week, next month     Saturday, Monday, the 1st, at 08:00
- *   3pm, 15:30, 9.45, 15 uhr, noon     today if still to come, else tomorrow
+ *   3pm, 15:30, 9.45, 15 uhr, 15h30    today if still to come, else tomorrow
  *
- * and any of the day words with one of the times after it ("tomorrow 9:30",
- * "fri noon", "2 days 3pm"). A bare hour from 1 to 7 is the afternoon one:
- * "3" means 15:00, as it does when said aloud, and nobody snoozes to 3am by
- * typing one digit. "am", "pm" and "uhr" say exactly which. "2h" is two
- * hours, not 02:00.
+ * and any of the day words with one of the times around it ("tomorrow 9:30",
+ * "fri noon", "2 days at 3pm", "Montag morgen", "15:30 am Freitag"). A time
+ * from 1 to 7:59 is the afternoon one: "3" means 15:00, as it does when said
+ * aloud, and nobody snoozes to 3am by typing one digit. "am", "pm", "uhr" or a
+ * leading zero ("07:30") say exactly which. "2h" is two hours; "15h" is 15:00,
+ * as French and German write it, since nobody means fifteen hours that way.
  */
-
-import { prefersHour12 } from "./clock_format.js";
 
 /** Where a day lands when no time is given: the hour every preset uses. */
 const MORNING_HOUR = 8;
@@ -65,13 +66,17 @@ const FILLER = new Set(["in", "at", "on", "um", "am", "this", "diesen", "diese",
 
 const NEXT = new Set(["next", "nachste", "nachsten", "nachstes", "naechste", "naechsten"]);
 
+/** Days a German "morgen" after them is the morning of: "Montag morgen", "heute morgen". */
+const MORNING_OF = (word) => Object.hasOwn(WEEKDAYS, word) || "heute" === word || "ubermorgen" === word;
+
 /**
  * @param {string} text what was typed
- * @param {string} now  the menu's own now, "YYYY-MM-DDTHH:MM"
- * @returns {string|null} the moment meant, same spelling, or null when not read
+ * @param {(instant: Date) => string} wallClock the menu's clock: an instant as "YYYY-MM-DDTHH:MM"
+ * @param {Date} [now]
+ * @returns {string|null} the moment meant, on that clock, or null when not read
  */
-export function readTypedTime(text, now) {
-    const clock = parse(now);
+export function readTypedTime(text, wallClock, now = new Date()) {
+    const clock = parse(wallClock(now));
     const words = wordsOf(text);
 
     if (null === clock || 0 === words.length) {
@@ -81,7 +86,7 @@ export function readTypedTime(text, now) {
     const span = readSpan(words);
 
     if (null !== span) {
-        return span(clock);
+        return undefined === span.minutes ? span.on(clock) : wallClock(new Date(now.getTime() + span.minutes * 60_000));
     }
 
     const time = takeTime(words);
@@ -107,46 +112,32 @@ export function readTypedTime(text, now) {
     return today > spell(clock, clock.hour, clock.minute) ? today : spell(shift(clock, 1), time.hour, time.minute);
 }
 
-/**
- * The typed moment as the menu shows it: "Tue 8 Dec, 15:00", in the
- * interface's language and the user's 12- or 24-hour clock. Formatted through
- * UTC because the string already is the time on the menu's clock and must be
- * printed as it stands, not moved a second time (formatWallClock does the same).
- *
- * @param {string} at "YYYY-MM-DDTHH:MM"
- * @param {string|undefined} locale
- * @param {boolean} [hour12]
- */
-export function formatTypedTime(at, locale, hour12 = prefersHour12()) {
-    const clock = parse(at);
-
-    return new Intl.DateTimeFormat(locale, {
-        timeZone: "UTC",
-        weekday: "short",
-        day: "numeric",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12,
-    }).format(new Date(Date.UTC(clock.year, clock.month - 1, clock.day, clock.hour, clock.minute)));
-}
-
 // ── Reading ────────────────────────────────────────────────────────────────
 
-/** Lower case, accents gone (ü to u, ß to ss), "15uhr" and "3pm" split from their number. */
+/**
+ * Lower case, accents gone (ü to u, ß to ss), "a.m." as "am", "15h30" and "15h"
+ * as clock times, and "15uhr" and "3pm" split from their number.
+ */
 function wordsOf(text) {
     return String(text)
         .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "")
+        .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase()
         .replace(/ß/g, "ss")
+        .replace(/(^|[\s\d])([ap])\.m\.?(?=\s|$)/g, "$1$2m")
+        .replace(/\b(\d{1,2})h(\d{2})\b/g, "$1:$2")
+        .replace(/\b(1[3-9]|2[0-3])h\b/g, "$1:00")
         .replace(/(\d)([a-z])/g, "$1 $2")
         .replace(/[,@]/g, " ")
         .split(/\s+/)
         .filter((word) => "" !== word);
 }
 
-/** "2 days", "in 3 hours", "a week": the whole text is one span, maybe with a time after a day-sized one. */
+/**
+ * "2 days", "in 3 hours", "a week": the whole text is one span, maybe with a
+ * time after a day-sized one. Minutes for an elapsed span; otherwise `on`,
+ * which counts from today's wall clock.
+ */
 function readSpan(words) {
     const rest = words[0] === "in" ? words.slice(1) : words;
 
@@ -155,7 +146,7 @@ function readSpan(words) {
     }
 
     const count = ONE.has(rest[0]) ? 1 : /^\d{1,3}$/.test(rest[0]) ? Number(rest[0]) : null;
-    const unit  = UNITS[rest[1]];
+    const unit  = Object.hasOwn(UNITS, rest[1]) ? UNITS[rest[1]] : undefined;
 
     if (null === count || undefined === unit) {
         return null;
@@ -164,19 +155,21 @@ function readSpan(words) {
     const tail = rest.slice(2);
 
     if ("minute" === unit || "hour" === unit) {
-        return 0 === tail.length ? (clock) => addMinutes(clock, count * ("hour" === unit ? 60 : 1)) : null;
+        return 0 === tail.length ? { minutes: count * ("hour" === unit ? 60 : 1) } : null;
     }
 
     const time = takeTime(tail);
 
-    if (null === time || tail.length > 0) {
+    if (null === time || tail.some((word) => false === FILLER.has(word))) {
         return null;
     }
 
-    return (clock) => {
-        const date = "month" === unit ? addMonths(clock, count) : shift(clock, count * ("week" === unit ? 7 : 1));
+    return {
+        on: (clock) => {
+            const date = "month" === unit ? addMonths(clock, count) : shift(clock, count * ("week" === unit ? 7 : 1));
 
-        return spell(date, time.hour ?? MORNING_HOUR, time.minute ?? 0);
+            return spell(date, time.hour ?? MORNING_HOUR, time.minute ?? 0);
+        },
     };
 }
 
@@ -188,10 +181,10 @@ function takeTime(words) {
     for (let at = 0; at < words.length; at++) {
         const word = words[at];
 
-        if (Object.hasOwn(PART_OF_DAY, word)) {
+        if (Object.hasOwn(PART_OF_DAY, word) || ("morgen" === word && at > 0 && MORNING_OF(words[at - 1]))) {
             words.splice(at, 1);
 
-            return { hour: PART_OF_DAY[word], minute: 0 };
+            return { hour: PART_OF_DAY[word] ?? MORNING_HOUR, minute: 0 };
         }
 
         const match = /^(\d{1,2})(?:[:.](\d{2}))?$/.exec(word);
@@ -200,8 +193,10 @@ function takeTime(words) {
             continue;
         }
 
-        const marker = ["am", "pm", "a", "p", "uhr"].includes(words[at + 1]) ? words[at + 1] : null;
+        // After an hour past noon, "am" is German for "on": "15:30 am Freitag".
         let hour     = Number(match[1]);
+        const after  = words[at + 1];
+        const marker = ["am", "pm", "a", "p", "uhr"].includes(after) && false === ("am" === after && hour > 12) ? after : null;
         const minute = undefined === match[2] ? 0 : Number(match[2]);
 
         words.splice(at, null === marker ? 1 : 2);
@@ -216,7 +211,7 @@ function takeTime(words) {
             }
 
             hour = hour % 12 + ("pm" === marker || "p" === marker ? 12 : 0);
-        } else if (null === marker && hour >= 1 && hour <= 7) {
+        } else if (null === marker && hour >= 1 && hour <= 7 && false === match[1].startsWith("0")) {
             hour += 12;
         }
 
@@ -285,12 +280,6 @@ function fromUtc(ms) {
 
 function shift(clock, days) {
     return fromUtc(Date.UTC(clock.year, clock.month - 1, clock.day + days, clock.hour, clock.minute));
-}
-
-function addMinutes(clock, minutes) {
-    const moved = fromUtc(Date.UTC(clock.year, clock.month - 1, clock.day, clock.hour, clock.minute + minutes));
-
-    return spell(moved, moved.hour, moved.minute);
 }
 
 /** The same date that many months on, or the month's last day where it is shorter (31 Jan + 1 month is 28 Feb). */

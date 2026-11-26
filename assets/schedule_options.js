@@ -303,8 +303,9 @@ export function scheduleOptions(timeZone, now = new Date()) {
  * @param {string} at wall clock, "YYYY-MM-DDTHH:MM"
  * @param {string} locale
  * @param {boolean} [hour12] overrides the document-level preference
+ * @param {boolean} [withDate] adds the day and month, for a time that can be weeks out
  */
-export function formatWallClock(at, locale, hour12 = prefersHour12()) {
+export function formatWallClock(at, locale, hour12 = prefersHour12(), withDate = false) {
     const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(at);
 
     if (null === match) {
@@ -316,6 +317,7 @@ export function formatWallClock(at, locale, hour12 = prefersHour12()) {
     return new Intl.DateTimeFormat(locale || undefined, {
         timeZone: "UTC",
         weekday: "short",
+        ...(withDate ? { day: "numeric", month: "short" } : {}),
         // `hourCycle` is not set alongside it on purpose: the two conflict, and
         // hour12 alone lets the locale keep its own idea of whether 24-hour
         // means h23 or h24.

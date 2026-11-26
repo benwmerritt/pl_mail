@@ -225,10 +225,10 @@ Variables: message, params (from the including context); placement.
         <button type="submit" hidden style="display:none" formnovalidate
                 formaction="{{ scheduleUrl }}"
                 data-compose--schedule-target="reading"
-                data-action="click->compose--schedule#choose"
+                data-action="click->compose--schedule#chooseTyped"
                 class="w-full flex items-center justify-between gap-3 px-3 py-2 text-sm text-ink
                        hover:bg-hover transition-colors text-left">
-            <span data-schedule-when class="tabular-nums"></span>
+            <span data-typed-when class="tabular-nums"></span>
             <kbd class="shrink-0 rounded border border-line bg-raised px-1.5 font-mono text-[11px] text-ink-muted" aria-hidden="true">↵</kbd>
         </button>
         <p data-compose--schedule-target="unread" hidden class="px-3 py-1.5 text-xs text-ink-faint"></p>
