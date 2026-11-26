@@ -66,6 +66,9 @@ test.describe("the command box", () => {
         await expect(palette(page).locator("[data-ui--settings-palette-target='status']")).not.toHaveText("");
         await expect(withKeys(page, "r")).toHaveCount(0);
 
+        // A search field's first Escape clears it (Chromium); the next closes the dialog.
+        await page.keyboard.press("Escape");
+        await expect(palette(page).getByRole("combobox")).toHaveValue("");
         await page.keyboard.press("Escape");
         await expect(palette(page)).toBeHidden();
 
