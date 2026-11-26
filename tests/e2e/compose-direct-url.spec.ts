@@ -58,8 +58,7 @@ test.describe("a compose URL opened directly", () => {
 
         // The recipient survived the round trip, which is what says the
         // redirect carried the URL rather than dropping it for a blank compose.
-        await expect(window_.locator(".ts-control, input[type='text']").first())
-            .not.toBeEmpty();
+        await expect(window_.locator(".ts-control").first()).not.toBeEmpty();
     });
 
     /**
