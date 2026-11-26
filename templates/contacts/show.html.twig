@@ -42,10 +42,9 @@ inRelations (ones pointing at it), refEmails (ReferenceEmailFinder rows).
                         {% if phonetic %}
                             <p class="text-xs text-ink-faint truncate">{{ phonetic }}</p>
                         {% endif %}
-                        {% if contact.jobTitle or contact.company or contact.department %}
-                            <p class="text-sm text-ink-muted">
-                                {{- [contact.jobTitle, contact.department, contact.company]|filter(v => v)|join(' · ') -}}
-                            </p>
+                        {% set role = [contact.jobTitle, contact.department, contact.company != contact.displayName ? contact.company : null]|filter(v => v) %}
+                        {% if role is not empty %}
+                            <p class="text-sm text-ink-muted">{{ role|join(' · ') }}</p>
                         {% endif %}
                         {% if contact.officeLocation %}
                             <p class="text-xs text-ink-faint truncate">{{ 'contacts.field.officeLocation'|trans }}: {{ contact.officeLocation }}</p>
@@ -240,7 +239,7 @@ inRelations (ones pointing at it), refEmails (ReferenceEmailFinder rows).
                                         </span>
                                         <span class="block truncate text-xs text-ink-faint">
                                             {{ row.fromName ?: row.fromAddress }}
-                                            {% if row.receivedAt %} · {{ row.receivedAt|intl_date('dMMMy') }}, {{ row.receivedAt|date(clock.time) }}{% endif %}
+                                            {% if row.receivedAt %} · {{ row.receivedAt|intl_date('dMMMy', clock.timezone) }}, {{ row.receivedAt|date(clock.time, clock.timezone) }}{% endif %}
                                         </span>
                                     </span>
                                     {% if row.hasAttachment %}
