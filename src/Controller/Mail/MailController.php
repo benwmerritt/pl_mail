@@ -301,6 +301,7 @@ final class MailController extends AbstractController
     public function inbox(
         Request $request,
         InboxZeroDays $inboxZero,
+        EntityManagerInterface $em,
         ?int $inbox = null,
     ): Response {
         $user = $this->getUser();
@@ -378,6 +379,22 @@ final class MailController extends AbstractController
 
         $this->preloadRows($threads);
 
+        // Inbox zero (BMAIL-15). The reader's own inbox, the one /mail/inbox
+        // opens, counts a day when its Primary, or its one list with the tabs
+        // off, holds nothing. Counted here rather than from the browser: every
+        // archive is followed by a refresh of this list, so the day is
+        // recorded from the server's own count, and a failed archive or a
+        // full first page cannot claim it.
+        $countsZero = $unified === $this->unifiedInboxes->first($user);
+        $primaryIsEmpty = $tabbed
+            ? 0 === ($tabTotals[MessageCategory::Primary->value] ?? 0)
+            : false === $unreadOnly && 0 === $total;
+
+        if (true === $countsZero && true === $primaryIsEmpty) {
+            $inboxZero->record($user);
+            $em->flush();
+        }
+
         return $this->renderList($request, 'mail/inbox.html.twig', $threads, [
             'unified_inbox' => $unified,
             'tab'         => $tab,
@@ -389,13 +406,12 @@ final class MailController extends AbstractController
             'per_page'    => self::PER_PAGE,
             'list_sort'   => $sort,
             'unread_only' => $unreadOnly,
-            // The picture an emptied list turns into (BMAIL-15). Only on the
-            // first page of the whole list: an empty second page or an empty
-            // unread filter is not zero. Only Primary, or the one list with
-            // the tabs off, counts towards the week.
+            // The picture an emptied list turns into. Only on the first page
+            // of the whole list: an empty second page or an empty unread
+            // filter is not zero. The week shows where it is counted.
             'inbox_zero'  => 1 === $page && false === $unreadOnly ? [
                 'week'   => $inboxZero->week($user, $request->getLocale()),
-                'counts' => null === $tab || MessageCategory::Primary->value === $tab->value,
+                'counts' => true === $countsZero && (null === $tab || MessageCategory::Primary->value === $tab->value),
             ] : null,
         ]);
     }

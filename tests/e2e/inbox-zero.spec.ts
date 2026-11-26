@@ -8,10 +8,8 @@ import { rowAction } from "./support/rows";
  *
  * What only a browser can say: the picture stays out of the way while there is
  * mail, comes up the moment the last row is archived (before the server has
- * answered), and today is counted and still counted after a reload.
- *
- * REMINDER: run `php bin/console asset-map:compile` after any JS change, or
- * Playwright reads the previous build.
+ * answered), and the refresh that follows draws today counted. Which days
+ * count is InboxZeroDaysTest's.
  */
 
 const ROWS = '#message-list li[data-controller~="mail--message-row"]';
@@ -50,36 +48,24 @@ test("archiving the last conversation shows the picture and counts today", async
     await expect(page.locator(ROWS)).toHaveCount(1);
     await expect(picture).toBeHidden();
 
-    const recorded = page.waitForResponse(
-        (response) => response.url().endsWith("/mail/inbox-zero") && "POST" === response.request().method(),
-    );
-
     await rowAction(page.locator(ROWS).first(), /^Archive$/);
 
     await expect(picture).toBeVisible();
     await expect(picture.getByText("Inbox zero.")).toBeVisible();
-    expect((await recorded).status()).toBe(204);
-
-    const today = picture.locator('[data-mail--inbox-zero-target="today"]');
-    await expect(today).toHaveAttribute("data-reached", "");
-    await expect(picture.locator('[data-mail--inbox-zero-target="caption"]')).toHaveText(/^Clear on [1-7] of the last 7 days$/);
     await expect(picture.locator(".inbox-zero-dot")).toHaveCount(7);
+
+    const today = picture.locator(".inbox-zero-dot[data-today]");
+    await expect(today, "the refresh after the archive draws today counted").toHaveAttribute("data-reached", "", { timeout: 15_000 });
+    await expect(picture.locator("[data-inbox-zero-caption]")).toHaveText(/^Clear on [1-7] of the last 7 days$/);
 
     await page.reload();
 
     await expect(picture).toBeVisible();
-    await expect(today, "today is kept by the server, not just drawn").toHaveAttribute("data-reached", "");
+    await expect(today, "still counted after a reload").toHaveAttribute("data-reached", "");
 });
 
 test("an empty tab other than Primary shows the picture without the week", async ({ page }) => {
     // seed-mail files every fixture thread under Primary, so Updates is empty.
-    const posts: string[] = [];
-    page.on("request", (request) => {
-        if (request.url().endsWith("/mail/inbox-zero")) {
-            posts.push(request.method());
-        }
-    });
-
     await page.goto("/mail/inbox?tab=updates");
 
     const picture = page.locator("#message-list .inbox-zero");
@@ -88,5 +74,4 @@ test("an empty tab other than Primary shows the picture without the week", async
     await expect(picture).toBeVisible();
     await expect(picture.getByText("Nothing here.")).toBeVisible();
     await expect(picture.locator(".inbox-zero-dot")).toHaveCount(0);
-    expect(posts, "only Primary counts towards the week").toEqual([]);
 });

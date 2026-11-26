@@ -39,24 +39,14 @@ final class InboxZeroDaysTest extends TestCase
         self::assertSame(['2026-08-10'], $user->getSetting(InboxZeroDays::SETTING));
     }
 
-    public function testOnlyAFortnightIsKept(): void
+    public function testOnlyTheWeekTheStripDrawsIsKept(): void
     {
-        $user  = new User();
-        $older = [];
+        $user = new User();
+        $user->setSetting(InboxZeroDays::SETTING, ['2026-08-09', '2026-08-04', '2026-08-03', '2026-07-20']);
 
-        for ($day = 1; $day <= 20; ++$day) {
-            $older[] = sprintf('2026-07-%02d', $day);
-        }
-
-        $user->setSetting(InboxZeroDays::SETTING, $older);
         $this->days('2026-08-10T09:00:00+00:00')->record($user);
 
-        $kept = $user->getSetting(InboxZeroDays::SETTING);
-
-        self::assertIsArray($kept);
-        self::assertCount(14, $kept);
-        self::assertSame('2026-08-10', $kept[0]);
-        self::assertSame('2026-07-08', $kept[13]);
+        self::assertSame(['2026-08-10', '2026-08-09', '2026-08-04'], $user->getSetting(InboxZeroDays::SETTING));
     }
 
     public function testTheWeekRunsOldestFirstAndEndsToday(): void

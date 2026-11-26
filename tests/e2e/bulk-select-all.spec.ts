@@ -53,6 +53,8 @@ test.afterAll(() => {
 
 const TOOLBAR = '[data-controller="mail--list-toolbar"]';
 const BANNER = '[data-mail--list-toolbar-target="viewBanner"]';
+// A conversation, not the inbox-zero picture drawn after them.
+const ROW = "#message-list li[data-controller~='mail--message-row']";
 
 async function selectEveryRowOnScreen(page: import("@playwright/test").Page) {
     await page.locator(`${TOOLBAR} [role="checkbox"]`).first().click();
@@ -61,7 +63,7 @@ async function selectEveryRowOnScreen(page: import("@playwright/test").Page) {
 test.describe("selecting past the page", () => {
     test("offers the whole view once the page is selected, and acts on it in one request", async ({ page }) => {
         await page.goto("/mail/inbox");
-        await expect(page.locator("#message-list li").first()).toBeVisible();
+        await expect(page.locator(ROW).first()).toBeVisible();
 
         const banner = page.locator(BANNER);
         await expect(banner, "the offer is showing before anything is selected").toBeHidden();
@@ -71,7 +73,7 @@ test.describe("selecting past the page", () => {
 
         // The offer names the real total, not the page size.
         const total = Number(await page.locator(TOOLBAR).getAttribute("data-mail--list-toolbar-total-value"));
-        const rows = await page.locator("#message-list li").count();
+        const rows = await page.locator(ROW).count();
 
         expect(total, "this fixture does not span more than one page").toBeGreaterThan(rows);
         await expect(banner).toContainText(String(total));
@@ -124,7 +126,7 @@ test.describe("selecting past the page", () => {
         // The whole view went, not the page: what is left is whatever else this
         // worker's mailbox holds, and it has to be less than a full page.
         await expect
-            .poll(() => page.locator("#message-list li").count(), { timeout: 15_000 })
+            .poll(() => page.locator(ROW).count(), { timeout: 15_000 })
             .toBeLessThan(rows);
 
         // One request for all of it — the thing that makes this safe to offer.
@@ -143,11 +145,11 @@ test.describe("selecting past the page", () => {
      */
     test("the select menu reaches the whole view, and unticking a row leaves it", async ({ page }) => {
         await page.goto("/mail/inbox");
-        await expect(page.locator("#message-list li").first()).toBeVisible();
+        await expect(page.locator(ROW).first()).toBeVisible();
 
         const toolbar = page.locator(TOOLBAR);
         const total = Number(await toolbar.getAttribute("data-mail--list-toolbar-total-value"));
-        const rows = await page.locator("#message-list li").count();
+        const rows = await page.locator(ROW).count();
         const count = page.locator('[data-mail--list-toolbar-target="selectionCount"]');
 
         await page.locator('[data-mail--list-toolbar-target="selectMenuBtn"]').click();
@@ -179,7 +181,7 @@ test.describe("selecting past the page", () => {
      */
     test("a selection survives the pager, in both directions", async ({ page }) => {
         await page.goto("/mail/inbox");
-        await expect(page.locator("#message-list li").first()).toBeVisible();
+        await expect(page.locator(ROW).first()).toBeVisible();
 
         const count = page.locator('[data-mail--list-toolbar-target="selectionCount"]');
         const tick = (index: number) =>
@@ -217,7 +219,7 @@ test.describe("selecting past the page", () => {
         await tick(0);
         await page.goto("/mail/sent");
         await page.goto("/mail/inbox");
-        await expect(page.locator("#message-list li").first()).toBeVisible();
+        await expect(page.locator(ROW).first()).toBeVisible();
         await expect(count).toHaveText("");
     });
 
@@ -231,7 +233,7 @@ test.describe("selecting past the page", () => {
      */
     test("the pager agrees with the rows after a bulk action", async ({ page }) => {
         await page.goto("/mail/inbox");
-        await expect(page.locator("#message-list li").first()).toBeVisible();
+        await expect(page.locator(ROW).first()).toBeVisible();
 
         await selectEveryRowOnScreen(page);
         await page.locator(BANNER).getByRole("button").click();
@@ -246,7 +248,7 @@ test.describe("selecting past the page", () => {
         // list as a whole.
         await expect
             .poll(async () => {
-                const rows = await page.locator("#message-list li").count();
+                const rows = await page.locator(ROW).count();
                 const text = await pager.innerText();
 
                 return text.includes(`of ${rows}`);
@@ -266,7 +268,7 @@ test.describe("selecting past the page", () => {
      */
     test("a refresh does not rebuild the toolbar and lose the selection", async ({ page }) => {
         await page.goto("/mail/inbox");
-        await expect(page.locator("#message-list li").first()).toBeVisible();
+        await expect(page.locator(ROW).first()).toBeVisible();
 
         await selectEveryRowOnScreen(page);
 

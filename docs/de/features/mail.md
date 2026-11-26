@@ -1,4 +1,4 @@
-<!-- translated-from: features/mail.md sha1:68acd5a86d063e5877119816ea854e06a94dfd5b -->
+<!-- translated-from: features/mail.md sha1:a7e0e7b2f915a7a79f9cac15ed26bfc10bdd6dfd -->
 
 # Mail
 
@@ -365,10 +365,11 @@ Theme und lädt nichts von anderswo. Archivierst du die letzte Konversation, ers
 Darunter stehen die letzten sieben Tage, je ein Punkt, gefüllt an den Tagen, an denen der Posteingang
 leer wurde, mit einer Zahl darunter („An 3 der letzten 7 Tage leer“). Zeig auf einen Punkt, um sein
 Datum zu sehen. Ein Tag zählt, wenn **Allgemein** leer ist, oder die eine Liste, wenn du die Tabs
-ausgeschaltet hast, nach deinem eigenen Kalender in der Zeitzone aus deinen Einstellungen. Die
-anderen Tabs zeigen das Bild, wenn sie leer sind, zählen aber nicht, und ebenso wenig eine spätere
-Seite oder der Filter für Ungelesenes. Die Tage werden bei deinen Einstellungen gespeichert, jeweils
-zwei Wochen.
+ausgeschaltet hast, nach deinem eigenen Kalender in der Zeitzone aus deinen Einstellungen. Gezählt
+wird, wenn die Liste gezeichnet wird, also füllt sich der Punkt, sobald die Liste nach dem
+Archivieren neu lädt. Mit [mehreren Posteingängen](#mehrere-posteingänge) zählt nur der erste. Die
+anderen Tabs und Posteingänge zeigen das Bild, wenn sie leer sind, aber nicht die Woche; eine
+spätere Seite oder der Filter für Ungelesenes zeigt keins von beiden. Nur die letzten sieben Tage werden gespeichert, bei deinen Einstellungen.
 
 ## Was eine Listenzeile zeigt
 

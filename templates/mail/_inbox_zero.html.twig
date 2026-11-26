@@ -4,26 +4,22 @@ mail/_inbox_zero.html.twig — what an emptied inbox turns into (BMAIL-15).
 Drawn after the rows every time, not only when the list arrives empty: the
 list empties in the browser when the last row is archived, before any refresh,
 and this has to be there already to take its place. app.css hides it while a
-row that is not on its way out stands in front of it, so it needs no script to
-show.
+row that is not on its way out stands in front of it. The week is the
+server's: the refresh after the archive draws today's dot filled.
 
 The picture is drawn from the theme's own colours, inline, so it follows the
 theme and asks nothing of the network.
 
-`zero.counts` is false on the tabs other than Primary: they get the calm
-picture but not the week, which is about the inbox you read as your inbox.
+`zero.counts` is false on the tabs other than Primary and on inboxes other than
+the reader's own: they get the calm picture but not the week.
 #}
-<li data-inbox-zero
-    data-controller="mail--inbox-zero"
-    data-mail--inbox-zero-url-value="{{ zero.counts ? path('app_mail_inbox_zero') : '' }}"
-    data-mail--inbox-zero-days-value="{{ 'inbox.zero.days'|trans({ '%count%': '__COUNT__' }) }}"
-    class="inbox-zero flex flex-col items-center justify-center gap-5 px-6 py-16 text-center">
+<li class="inbox-zero flex flex-col items-center justify-center gap-5 px-6 py-16 text-center">
     <svg viewBox="0 0 240 120" class="w-56 max-w-full h-auto" aria-hidden="true" focusable="false">
         <circle cx="168" cy="44" r="22" class="fill-accent/25"></circle>
         <circle cx="168" cy="44" r="13" class="fill-accent/45"></circle>
         <path d="M0 96 C40 70 80 70 120 88 S200 108 240 84 V120 H0 Z" class="fill-accent/15"></path>
         <path d="M0 106 C50 90 90 96 140 104 S210 110 240 100 V120 H0 Z" class="fill-accent/30"></path>
-        <path d="M24 60 h18 M56 50 h12" class="stroke-ink-faint/50" stroke-width="2" stroke-linecap="round" fill="none"></path>
+        <path d="M40 58 q6 -6 12 0 q6 -6 12 0 M78 44 q4 -4 8 0 q4 -4 8 0" class="stroke-ink-faint/60" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
     </svg>
 
     <div class="flex flex-col gap-1.5 max-w-xs">
@@ -34,17 +30,17 @@ picture but not the week, which is about the inbox you read as your inbox.
     {% if zero.counts %}
         {% set reached = zero.week|filter(day => day.reached)|length %}
         <div class="flex flex-col items-center gap-2">
-            <div class="flex items-end gap-2.5" role="img" aria-label="{{ 'inbox.zero.days'|trans({ '%count%': reached }) }}">
+            <div class="flex items-end gap-2.5" aria-hidden="true">
                 {% for day in zero.week %}
                     <div class="flex flex-col items-center gap-1" title="{{ day.name }}">
                         <span class="inbox-zero-dot size-2.5 rounded-full border border-accent/50"
                               {% if day.reached %}data-reached{% endif %}
-                              {% if day.today %}data-mail--inbox-zero-target="today"{% endif %}></span>
+                              {% if day.today %}data-today{% endif %}></span>
                         <span class="text-[0.65rem] leading-none {{ day.today ? 'text-ink font-medium' : 'text-ink-faint' }}">{{ day.initial }}</span>
                     </div>
                 {% endfor %}
             </div>
-            <p class="text-xs text-ink-faint" data-mail--inbox-zero-target="caption">{{ 'inbox.zero.days'|trans({ '%count%': reached }) }}</p>
+            <p class="text-xs text-ink-faint" data-inbox-zero-caption>{{ 'inbox.zero.days'|trans({ '%count%': reached }) }}</p>
         </div>
     {% endif %}
 </li>

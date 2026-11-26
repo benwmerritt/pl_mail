@@ -2973,7 +2973,7 @@ inbox:
         heading: "Boîte de réception vide."
         heading_tab: "Rien ici."
         body: "Tout est traité. Profitez du calme."
-        days: "Vide %count% jours sur les 7 derniers"
+        days: "Boîte vide %count% jour sur les 7 derniers|Boîte vide %count% jours sur les 7 derniers"
 
 insights:
     card:

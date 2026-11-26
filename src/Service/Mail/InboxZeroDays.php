@@ -17,18 +17,15 @@ use Symfony\Component\Clock\ClockInterface;
  * off) had nothing left in it. Kept as dates in the user's settings bag rather
  * than a table: a fortnight of short strings, written at most once a day.
  *
- * A day is recorded by the page, not here: the list empties in the browser
- * when the last row is archived, and only the browser sees that moment.
+ * Only the days the strip draws are kept: a week of short strings, written
+ * at most once a day, by MailController::inbox() when it counts Primary empty.
  */
 final readonly class InboxZeroDays
 {
     public const string SETTING = 'mail.inbox_zero_days';
 
-    /** Shown: today and the six before it. */
+    /** Shown and kept: today and the six before it. */
     public const int SHOWN = 7;
-
-    /** Kept: twice what is shown, so the strip never loses a day it draws. */
-    private const int KEPT = 14;
 
     public function __construct(
         private UserTimezoneResolver $zones,
@@ -39,17 +36,19 @@ final readonly class InboxZeroDays
     /** Today, in the user's calendar, is a day the inbox reached zero. Idempotent. */
     public function record(User $user): void
     {
-        $today = $this->today($user)->format('Y-m-d');
+        $today = $this->today($user);
+        $date  = $today->format('Y-m-d');
         $days  = $this->days($user);
 
-        if (true === in_array($today, $days, true)) {
+        if (true === in_array($date, $days, true)) {
             return;
         }
 
-        $days[] = $today;
+        $oldest = $today->modify(sprintf('-%d days', self::SHOWN - 1))->format('Y-m-d');
+        $days   = array_filter([$date, ...$days], static fn (string $day): bool => $day >= $oldest);
         rsort($days);
 
-        $user->setSetting(self::SETTING, array_slice($days, 0, self::KEPT));
+        $user->setSetting(self::SETTING, $days);
     }
 
     /**

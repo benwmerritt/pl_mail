@@ -10,6 +10,7 @@ The inbox lists conversations newest first, split into Primary, Promotions and U
 - `mail-star` stars a conversation so it shows in Starred.
 - `mail-snooze` hides a conversation until a time, listed under Snoozed.
 - `mail-swipe` archives or marks read by swiping a row on a phone.
+- `mail-zero` replaces an emptied inbox or tab with a picture, and on Primary a strip of the last seven days it reached zero.
 
 ## How to get to it (user POV)
 
@@ -31,6 +32,7 @@ Preconditions:
 - **Star.** `rowAction(row, "Star this message")`; the row's button becomes `Unstar this message` and the row shows on `/mail/starred`.
 - **Snooze.** `rowAction(row, "Snooze")` opens a menu of times; after choosing one the row leaves the inbox and shows its wake time on `/mail/snoozed`. `tests/e2e/snoozed-list.spec.ts` drives this.
 - **Swipe.** `tests/e2e/row-swipe.spec.ts` drives a real touch drag on `[data-swipe-content]` and the revealed `[data-swipe-commit]` button; reuse its helpers in a phone spec.
+- **Inbox zero.** Archive every row in Primary (`ajaxPost(page, "/status/bulk/archive", { ids, scope: "inbox", value: "" })` from `tests/e2e/support/config.ts`, then `rowAction` on the last). `#message-list .inbox-zero` shows `Inbox zero.` and seven `.inbox-zero-dot`s, today's carrying `data-reached`, and still does after `page.reload()`. `tests/e2e/inbox-zero.spec.ts` drives this.
 - **Proof.** `shot` the inbox, the open conversation, the inbox after the action and the folder it moved to. `scratch/archive.spec.ts` in the SKILL.md example is this recipe.
 
 ## Gotchas
