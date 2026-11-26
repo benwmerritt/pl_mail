@@ -200,7 +200,7 @@ export default class extends Controller {
     connect() {
         this._listUrl = this.openValue ? null : window.location.href;
         this._selectedPath = null;
-        // Counts the reader's own moves — opening, closing, Back — so an
+        // Counts the reader's own moves — opening, closing, Back, another folder — so an
         // auto-advance still loading can tell it has been overtaken. See leaving().
         this._navigation = 0;
         this._onPopState = this._handlePopState.bind(this);
@@ -260,6 +260,7 @@ export default class extends Controller {
                 return;
             }
 
+            this._navigation++;
             this._showList();
         };
         document.addEventListener("turbo:frame-load", this._onListSwap);
@@ -515,7 +516,7 @@ export default class extends Controller {
                 return;
             }
 
-            const shown = await this._loadMessage(next, current);
+            const shown = await this._loadMessage(next, { current, navigateOnError: false });
 
             if (false === current()) {
                 return;
@@ -559,11 +560,15 @@ export default class extends Controller {
 
     /**
      * @param {string} url
-     * @param {() => boolean} current  false once the answer is no longer wanted,
-     *        which leaves the pane as it is
+     * @param {{current?: () => boolean, navigateOnError?: boolean}} options
+     *        `current` is false once the answer is no longer wanted, which
+     *        leaves the pane as it is. `navigateOnError` false answers a
+     *        refusal with false instead of loading the page in full: an
+     *        auto-advance to a conversation that has gone since goes back to
+     *        the list rather than to an error page.
      * @returns {Promise<boolean>} whether the message was put in the pane
      */
-    async _loadMessage(url, current = () => true) {
+    async _loadMessage(url, { current = () => true, navigateOnError = true } = {}) {
         let response;
 
         try {
@@ -582,7 +587,10 @@ export default class extends Controller {
         }
 
         if (!response.ok) {
-            window.location.href = url; // fall back to a real navigation on failure
+            if (navigateOnError) {
+                window.location.href = url; // fall back to a real navigation on failure
+            }
+
             return false;
         }
 
